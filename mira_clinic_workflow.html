@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orthopedic Spine Clinic Workflow | Mira Health</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e2d47;
+    --text: #e8edf5;
+    --text-muted: #7a8ba3;
+    --text-dim: #3d5068;
+
+    --physician: #c084fc;
+    --physician-bg: #1e1033;
+    --physician-border: #7c3aed;
+
+    --app: #38bdf8;
+    --app-bg: #0c1f30;
+    --app-border: #0369a1;
+
+    --ma: #fbbf24;
+    --ma-bg: #1a1200;
+    --ma-border: #b45309;
+
+    --bo: #fb923c;
+    --bo-bg: #1c0e04;
+    --bo-border: #c2410c;
+
+    --auto: #00ff9d;
+    --auto-glow: rgba(0,255,157,0.15);
+
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-serif: 'Libre Baskerville', serif;
+    --font-sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .logo span {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--auto);
+    background: rgba(0,255,157,0.08);
+    border: 1px solid rgba(0,255,157,0.2);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 48px;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 680px;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+
+  .stat-cell {
+    background: var(--surface);
+    padding: 16px 20px;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .stat-value.green { color: var(--auto); }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.purple { color: var(--physician); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+    align-items: center;
+  }
+
+  .legend-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-right: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-dot.physician { background: var(--physician); }
+  .legend-dot.app { background: var(--app); }
+  .legend-dot.ma { background: var(--ma); }
+  .legend-dot.bo { background: var(--bo); }
+
+  .legend-auto {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--auto);
+    font-family: var(--font-mono);
+  }
+
+  .legend-auto-box {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--auto);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Workflow */
+  .workflow-section {
+    margin-bottom: 48px;
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Step card */
+  .step-card {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    overflow: hidden;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .step-card:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  .step-card.automation-target {
+    border-color: rgba(0,255,157,0.3);
+  }
+
+  .step-card.automation-target:hover {
+    border-color: var(--auto);
+    box-shadow: 0 0 20px var(--auto-glow);
+  }
+
+  .step-card.open {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  .step-card.open.automation-target {
+    border-color: var(--auto);
+    box-shadow: 0 0 24px var(--auto-glow);
+  }
+
+  .step-header {
+    display: grid;
+    grid-template-columns: 52px 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    min-height: 64px;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .step-num-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    border: 1px solid;
+  }
+
+  .step-num-badge.physician {
+    background: var(--physician-bg);
+    border-color: var(--physician-border);
+    color: var(--physician);
+  }
+
+  .step-num-badge.app {
+    background: var(--app-bg);
+    border-color: var(--app-border);
+    color: var(--app);
+  }
+
+  .step-num-badge.ma {
+    background: var(--ma-bg);
+    border-color: var(--ma-border);
+    color: var(--ma);
+  }
+
+  .step-num-badge.bo {
+    background: var(--bo-bg);
+    border-color: var(--bo-border);
+    color: var(--bo);
+  }
+
+  .step-num-badge.mixed {
+    background: var(--surface2);
+    border-color: var(--text-dim);
+    color: var(--text-muted);
+  }
+
+  /* Split badges for two-personnel steps */
+  .step-num-badge.split {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+    color: transparent; /* text hidden, shown via pseudo */
+  }
+
+  .step-num-badge.split .split-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bg);
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  .step-num-badge.split::before,
+  .step-num-badge.split::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
+
+  /* Each combo gets a named class: left color / right color (diagonal split) */
+  .split-physician-bo::before  { background: var(--physician); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-physician-bo::after   { background: var(--bo);        clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-physician-bo          { border-color: var(--physician-border); }
+
+  .split-physician-ma::before  { background: var(--physician); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-physician-ma::after   { background: var(--ma);        clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-physician-ma          { border-color: var(--physician-border); }
+
+  .split-physician-app::before { background: var(--physician); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-physician-app::after  { background: var(--app);       clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-physician-app         { border-color: var(--physician-border); }
+
+  .split-ma-bo::before  { background: var(--ma); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-ma-bo::after   { background: var(--bo); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-ma-bo          { border-color: var(--ma-border); }
+
+  .split-app-ma::before  { background: var(--app); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-app-ma::after   { background: var(--ma);  clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-app-ma          { border-color: var(--app-border); }
+
+  .split-app-bo::before  { background: var(--app); clip-path: polygon(0 0, 100% 0, 0 100%); }
+  .split-app-bo::after   { background: var(--bo);  clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .split-app-bo          { border-color: var(--app-border); }
+
+  /* Arrival divider */
+  .arrival-divider {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  .arrival-divider-inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 14px;
+  }
+
+  .arrival-divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.6), transparent);
+  }
+
+  .arrival-divider-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid rgba(0,212,255,0.35);
+    border-radius: 3px;
+    padding: 7px 16px;
+    white-space: nowrap;
+  }
+
+  .arrival-divider-icon {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .arrival-divider-text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .arrival-divider-sub {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+
+  .step-body {
+    flex: 1;
+  }
+
+  .step-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 3px;
+  }
+
+  .step-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .step-personnel {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .step-personnel.physician { color: var(--physician); }
+  .step-personnel.app { color: var(--app); }
+  .step-personnel.ma { color: var(--ma); }
+  .step-personnel.bo { color: var(--bo); }
+  .step-personnel.mixed { color: var(--text-muted); }
+
+  .step-time {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .auto-pill {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--auto);
+    background: rgba(0,255,157,0.08);
+    border: 1px solid rgba(0,255,157,0.25);
+    padding: 2px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .step-cost {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .step-cost .cost-val {
+    color: var(--text-muted);
+    font-size: 13px;
+    display: block;
+  }
+
+  .chevron {
+    color: var(--text-dim);
+    font-size: 12px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .step-card.open .chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Expanded content */
+  .step-detail {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 20px 18px;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .step-card.open .step-detail {
+    display: grid;
+  }
+
+  .detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .detail-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .automation-block {
+    grid-column: 1 / -1;
+    background: rgba(0,255,157,0.04);
+    border: 1px solid rgba(0,255,157,0.15);
+    border-radius: 3px;
+    padding: 14px 16px;
+  }
+
+  .automation-block .detail-label {
+    color: var(--auto);
+    margin-bottom: 8px;
+  }
+
+  .automation-block .detail-text {
+    color: rgba(0,255,157,0.7);
+  }
+
+  .cost-calc {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 2px;
+  }
+
+  .cost-box {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 14px;
+  }
+
+  .cost-box-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .cost-box-val {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .cost-box-val.red { color: #f87171; }
+  .cost-box-val.green { color: var(--auto); }
+
+  /* Connector line */
+  .connector {
+    width: 2px;
+    height: 8px;
+    background: var(--border);
+    margin: 0 auto;
+    position: relative;
+    left: 25px;
+  }
+
+  .connector.automation {
+    background: rgba(0,255,157,0.3);
+  }
+
+  /* Summary panel */
+  .summary-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-top: 32px;
+  }
+
+  .summary-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .summary-item {
+    border-left: 2px solid var(--border);
+    padding-left: 14px;
+  }
+
+  .summary-item.physician { border-color: var(--physician); }
+  .summary-item.app { border-color: var(--app); }
+  .summary-item.ma { border-color: var(--ma); }
+  .summary-item.bo { border-color: var(--bo); }
+  .summary-item.savings { border-color: var(--auto); }
+
+  .summary-item-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  .summary-item-value {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .summary-item-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Expand all toggle */
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .ctrl-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ctrl-btn.active {
+    background: rgba(0,212,255,0.08);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Filter */
+  .filter-auto {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--auto);
+    background: rgba(0,255,157,0.06);
+    border: 1px solid rgba(0,255,157,0.2);
+    padding: 6px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-auto:hover, .filter-auto.active {
+    background: rgba(0,255,157,0.12);
+    border-color: var(--auto);
+  }
+
+  .ctrl-sep {
+    color: var(--border);
+    font-size: 12px;
+  }
+
+  /* Footer */
+  .page-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+  }
+
+  .footer-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .mira-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+  }
+
+  @media (max-width: 640px) {
+    .step-header {
+      grid-template-columns: 40px 1fr auto;
+    }
+    .step-cost { display: none; }
+    .step-detail { grid-template-columns: 1fr; }
+    .cost-calc { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <header class="site-header">
+    <div class="logo">MIRA <span>/ HEALTH</span></div>
+    <div class="badge">INTERACTIVE WORKFLOW TOOL</div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Orthopedic Practice Intelligence</div>
+    <h1>Spine Clinic Visit <em>Workflow</em></h1>
+    <p class="hero-sub">A time-driven activity-based costing map of the 12-step orthopedic spine clinic encounter, from referral intake through charge submission. Click any step to expand task details, personnel cost calculations, and automation opportunity analysis.</p>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-cell">
+      <div class="stat-label">Total Steps</div>
+      <div class="stat-value blue">16 steps</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Cycle Time (Total)</div>
+      <div class="stat-value">116-290 min</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Physician Time</div>
+      <div class="stat-value purple">38-115 min</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Automation Targets</div>
+      <div class="stat-value green">14 steps</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Est. Savings / Encounter</div>
+      <div class="stat-value green">$42-$125</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">PERSONNEL:</span>
+    <span class="legend-item"><span class="legend-dot physician"></span>Physician</span>
+    <span class="legend-item"><span class="legend-dot app"></span>APP / PA</span>
+    <span class="legend-item"><span class="legend-dot ma"></span>Medical Assistant</span>
+    <span class="legend-item"><span class="legend-dot bo"></span>Back Office</span>
+    &nbsp;&nbsp;
+    <span class="legend-auto"><span class="legend-auto-box"></span>AI Automation Target</span>
+  </div>
+
+  <div class="workflow-section">
+
+    <div class="controls">
+      <button class="ctrl-btn" onclick="expandAll()">Expand All</button>
+      <button class="ctrl-btn" onclick="collapseAll()">Collapse All</button>
+      <span class="ctrl-sep">|</span>
+      <button class="filter-auto" id="filterBtn" onclick="toggleAutoFilter()">Show Automation Targets Only</button>
+    </div>
+
+    <div class="flow-container" id="flowContainer">
+
+      <!-- STEP 1 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge bo">01</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Referral Intake &amp; Categorization</div>
+            <div class="step-meta">
+              <span class="step-personnel bo">Back Office</span>
+              <span class="step-time">5-10 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-5</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Patient referred by primary care physician, emergency department, or specialist, or self-schedules. Referral is received via fax, EHR message, or telephone. Staff must categorize the referral by acuity and subspecialty, log it into the scheduling system, and initiate the intake workflow.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Key Decision Points</div>
+            <div class="detail-text">Acuity triage (urgent vs. routine), subspecialty routing (spine vs. joint vs. trauma), referral completeness check (imaging, notes, insurance), and documentation of referring provider for consultation letter routing.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">AI fax triage agents can read incoming fax content, extract diagnosis and acuity signals, auto-categorize by subspecialty, and populate the scheduling queue without staff intervention. Estimated time savings: 4-8 min per referral. At 30 new referrals per clinic day, this represents 2-4 hours of recovered back-office time daily.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box">
+              <div class="cost-box-label">Current Cost</div>
+              <div class="cost-box-val red">$2-5</div>
+            </div>
+            <div class="cost-box">
+              <div class="cost-box-label">With AI</div>
+              <div class="cost-box-val green">$0.50-1</div>
+            </div>
+            <div class="cost-box">
+              <div class="cost-box-label">Savings / Day (30 pts)</div>
+              <div class="cost-box-val green">$45-120</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 2 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge bo">02</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Insurance Eligibility &amp; Authorization Verification</div>
+            <div class="step-meta">
+              <span class="step-personnel bo">Back Office</span>
+              <span class="step-time">10-20 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$3-10</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Verify patient insurance eligibility and active coverage, confirm benefit structure (deductible status, co-pay amount, specialist co-insurance), and identify whether the planned services require prior authorization. Payer-specific authorization requirements must be cross-referenced against the anticipated procedure list.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Common Failure Modes</div>
+            <div class="detail-text">Expired coverage identified only at check-in (causing appointment cancellation), incorrect specialist tier assignment, failure to flag procedures requiring auth before scheduling, and payer-specific documentation requirements missed for high-cost imaging.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Real-time eligibility verification APIs (270/271 transaction sets) can confirm coverage status, deductible accumulation, and co-pay obligation in under 30 seconds. Auth requirement lookups can be automated against a payer rules engine. Reduces manual verification time by 80-90% and eliminates day-of eligibility surprises.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box">
+              <div class="cost-box-label">Current Cost</div>
+              <div class="cost-box-val red">$3-10</div>
+            </div>
+            <div class="cost-box">
+              <div class="cost-box-label">With AI</div>
+              <div class="cost-box-val green">$0.50-1.50</div>
+            </div>
+            <div class="cost-box">
+              <div class="cost-box-label">Error Prevention Value</div>
+              <div class="cost-box-val green">$50-300</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 3 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge bo">03</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Pre-Visit Screening, Scheduling &amp; Intake</div>
+            <div class="step-meta">
+              <span class="step-personnel bo">Back Office</span>
+              <span class="step-time">5-20 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-10</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Before scheduling, many spine practices apply physician-defined criteria that must be met as a condition of appointment access. Common gatekeeping requirements include: documented completion of a defined course of physical therapy (typically 6-12 weeks), at least one prior injection attempt, failure of structured conservative management with objective functional outcome data, updated imaging within a payer-specified recency window, and PCP referral with qualifying ICD-10 diagnosis. If criteria are unmet, the referral is held and the patient or referring provider is contacted to initiate the prerequisite pathway. Once criteria are confirmed, scheduling and intake proceed: EHR appointment creation, visit type and duration assignment (new spine consultation: 45-60 min), and transmission of the full intake packet.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Pre-Visit Screening Criteria (Examples)</div>
+            <div class="detail-text">Lumbar fusion candidate: 6 weeks PT, 2 injection attempts, MRI within 12 months, BMI and smoking cessation documented. Cervical disc arthroplasty: prior ACDF evaluation, imaging confirmation of single-level disease, no prior cervical instrumentation. Elective decompression: conservative trial documented in referring notes, functional limitation quantified (ODI &gt; 40 or equivalent). Criteria vary by surgeon, payer, and procedure type and must be customizable at the practice level.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Documentation Required Pre-Visit</div>
+            <div class="detail-text">Completed intake forms, updated medication list, prior imaging reports, PT discharge summary or progress notes confirming course completion, injection records with date and response documentation, operative reports from prior spine procedures, referring physician notes, and insurance cards. Incomplete pre-visit documentation is the primary cause of encounter time overrun and same-day cancellations.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">AI screening agent applies physician-configured criteria against the incoming referral record automatically: checks for PT documentation, injection history, imaging recency, and diagnosis code match. Referrals meeting criteria are auto-advanced to scheduling; those failing criteria trigger an automated outreach sequence to the referring provider or patient specifying exactly what documentation or prerequisite steps are needed. This converts a staff-intensive phone-and-fax workflow into a structured, auditable decision tree. Post-screening, AI pre-visit agent collects intake data via text or email, populates EHR fields directly, and flags incomplete items before the appointment. Reduces screening time by 60-80% and eliminates scheduling of patients who will require rescheduling after physician review.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost (Screen + Schedule)</div><div class="cost-box-val red">$5-10</div></div>
+            <div class="cost-box"><div class="cost-box-label">With AI Screening</div><div class="cost-box-val green">$0.50-2</div></div>
+            <div class="cost-box"><div class="cost-box-label">Avoided Reschedule Cost</div><div class="cost-box-val green">$50-150</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 4 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-ma-bo"><span class="split-text">04</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Chart Prep: Imaging Orders, Outside Records &amp; Clinical Document Acquisition</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">MA / Back Office</span>
+              <span class="step-time">20-60 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$6-30</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Chart preparation is a multi-component task performed in the days prior to the appointment. It encompasses three parallel workstreams: (1) imaging order placement and retrieval, (2) outside records acquisition, and (3) chart organization for physician pre-review. The time estimate reflects the full scope of this step across all three components and represents one of the highest-volume hidden labor costs in a busy spine practice.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Imaging Orders &amp; Retrieval</div>
+            <div class="detail-text">Determine minimum imaging requirements per physician protocol and scheduled visit type. New spine consultation requires standing AP and lateral radiographs at minimum. Confirm whether existing MRI or CT is available, current per payer recency requirements (typically 6-12 months), and accessible in local PACS. Order missing studies with appropriate ICD-10 diagnosis codes. Imaging protocols by presentation: cervical myelopathy requires AP/lateral plain films and MRI cervical spine; lumbar radiculopathy requires AP/lateral/flexion-extension lumbar and MRI lumbar spine; spondylolisthesis requires standing AP/lateral with flexion-extension views; post-operative evaluation requires AP/lateral with hardware visualization protocol; new trauma requires CT spine and AP/lateral plain films.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Outside Records &amp; Imaging Acquisition</div>
+            <div class="detail-text">For new consultations, staff must contact outside facilities to request records that are clinically necessary for the physician to formulate an assessment. This includes: fax or telephone requests to hospitals or imaging centers where prior MRI, CT, or plain films were performed; requests to pain management practices for prior injection records and response documentation; requests to neurology for EMG/nerve conduction studies; requests to primary care for longitudinal clinical notes documenting symptom progression, conservative treatment attempts, and reason for referral; and requests to prior spine surgeons for operative reports, implant records, and post-operative course documentation. Each request requires a signed patient authorization under HIPAA. Many facilities respond only via fax and require follow-up calls to confirm receipt and turnaround. Average resolution time per outside facility: 1-3 business days with 1-2 follow-up contacts.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Chart Organization for Physician Pre-Review</div>
+            <div class="detail-text">Once records are received, staff must index, upload to the EHR, and organize documents into the correct chart sections (imaging, outside records, referral notes, PT records, prior surgical history). Poorly organized charts require physicians to hunt for relevant documents during the encounter, consuming 5-15 minutes of encounter time per disorganized chart. Standardized chart prep protocols with named document categories and a pre-visit physician summary reduce encounter time and improve documentation quality.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">AI chart prep agents represent one of the highest-ROI automation targets in the pre-visit workflow. Automated image retrieval via Carequality and CommonWell networks can request and import outside imaging without staff phone or fax contact. AI fax processing agents can receive incoming records, classify document type, extract key clinical data points (injection dates, PT course duration, prior surgery, neurological findings), and index directly to the correct EHR section. Protocol-driven imaging order generation fires automatically at scheduling confirmation based on diagnosis code and visit type. AI-generated pre-visit summary presents the physician with a structured clinical brief covering: prior imaging findings, treatment history, outstanding records, and screening criteria status. This converts a reactive, multi-day manual workflow into an automated pre-visit intelligence package. Estimated staff time savings: 15-45 minutes per new patient encounter.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost / New Pt</div><div class="cost-box-val red">$6-30</div></div>
+            <div class="cost-box"><div class="cost-box-label">With AI Chart Prep</div><div class="cost-box-val green">$1-5</div></div>
+            <div class="cost-box"><div class="cost-box-label">Daily Savings (15 new pts)</div><div class="cost-box-val green">$75-375</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- ARRIVAL DIVIDER -->
+      <div class="arrival-divider">
+        <div class="arrival-divider-inner">
+          <div class="arrival-divider-line"></div>
+          <div class="arrival-divider-label">
+            <span class="arrival-divider-icon">&#9654;</span>
+            <div>
+              <div class="arrival-divider-text">Patient Enters Clinic</div>
+              <div class="arrival-divider-sub">Steps below occur on day of visit</div>
+            </div>
+          </div>
+          <div class="arrival-divider-line"></div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge bo">05</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Patient Arrival, Check-In &amp; Outside CD Collection</div>
+            <div class="step-meta">
+              <span class="step-personnel bo">Back Office</span>
+              <span class="step-time">5-15 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-8</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Patient arrives at front desk. Staff verifies patient identity, confirms demographics and contact information, collects government-issued ID and insurance cards, scans insurance cards for OCR processing, collects co-payment, reviews outstanding balances, and confirms completion of intake forms. Critically, staff must also ask whether the patient has brought outside imaging CDs or physical records and collect them immediately at check-in. CDs handed over at the front desk must be logged, labeled with patient name and MRN, and routed to the MA or imaging technologist for immediate import into local PACS before the patient is roomed. Delay in CD collection or failure to ask is one of the most avoidable sources of physician imaging retrieval burden during the encounter.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Outside CD Upload Protocol</div>
+            <div class="detail-text">CD received at check-in should be imported to local PACS or CD viewer workstation immediately, with a target completion time before the patient is called from the waiting area. Study must be linked to the correct patient MRN and labeled with the originating facility and study date. If the CD is unreadable or in an incompatible format, the MA must notify the physician before the encounter so imaging can be accessed via the referring facility's web viewer or a new order placed. CDs should be returned to the patient at checkout with a label confirming the study was imported. Staff must also ask whether the patient has paper records, operative reports, or physical therapy notes to be scanned and indexed to the chart.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Common Delays</div>
+            <div class="detail-text">Failure to ask about CDs at check-in (patient remembers in the exam room; CD import cannot complete before the physician enters), incomplete intake forms requiring manual completion at front desk, outdated insurance information requiring re-verification, outstanding balance disputes requiring manager escalation, and failure to collect co-pay at time of service.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Self-service kiosks or mobile check-in can handle identity verification, demographics confirmation, co-pay collection, and e-signature on consent forms without staff contact. A structured CD collection prompt built into the kiosk workflow ensures the question is never missed regardless of front desk volume. Automated PACS import queue management routes incoming CDs to the next available import workstation with real-time status tracking, alerting the rooming MA when import is complete or flagging failures before the physician encounter begins.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost</div><div class="cost-box-val red">$2-8</div></div>
+            <div class="cost-box"><div class="cost-box-label">With Kiosk + CD Queue</div><div class="cost-box-val green">$0.50-2</div></div>
+            <div class="cost-box"><div class="cost-box-label">Physician Time Saved / Day</div><div class="cost-box-val green">$336-$1,140</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 5b -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)" style="border-left: 3px solid rgba(0,212,255,0.4); margin-left: 20px;">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-ma-bo"><span class="split-text">5b</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Pre-Visit Radiograph Acquisition &amp; Waiting Area Direction</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">MA / Back Office</span>
+              <span class="step-time">10-20 min</span>
+              <span class="auto-pill">WORKFLOW AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$4-12</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Patients requiring same-day plain radiographs (standing AP and lateral spine, flexion-extension views) must be escorted or clearly directed to the radiology suite before being seated in the waiting area. This step requires a warm handoff: front desk staff communicates to the radiology technologist that the patient is arriving, confirms the ordered views, and provides the patient with explicit wayfinding instructions. After imaging is completed, the technologist or MA must direct the patient to the correct waiting area for their appointment. Failure at this handoff results in patients waiting in the wrong area, returning to the front desk confused, or being called to the exam room before imaging is available for physician review.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Wayfinding and Patient Flow Impact</div>
+            <div class="detail-text">In multi-suite or multi-floor practices, patients who are unfamiliar with the facility will not self-navigate reliably between check-in, radiology, and the waiting area without explicit direction at each transition. A missed handoff costs 5-15 minutes per patient: time spent by front desk staff locating the patient, re-escorting them, or repeating imaging acquisition. For a 30-patient clinic day with 50% requiring same-day imaging, unmanaged wayfinding failures affect 3-5 patients on average, consuming 15-75 minutes of MA and front desk recovery time.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Imaging Completion Verification</div>
+            <div class="detail-text">The rooming MA must confirm that ordered radiographs are available and loaded in the physician's imaging viewer before calling the patient to the exam room. Checking the PACS worklist for the completed study prevents the physician from entering an encounter with incomplete imaging. This verification should be a mandatory checklist item in the rooming protocol, not an ad hoc step dependent on individual MA awareness.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">WORKFLOW AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Digital patient tracking boards (standard in ED and OR settings) display real-time patient location status across check-in, radiology, and waiting areas, eliminating verbal handoffs and staff search time. Automated PACS worklist alerts notify the rooming MA the moment the patient's imaging study is finalized and available, triggering the room call reliably without manual checking. Patient-facing SMS wayfinding instructions sent at check-in confirm the imaging-then-waiting-room sequence and reduce patient confusion without requiring staff escort.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Wayfinding Failure Cost / Day</div><div class="cost-box-val red">$12-45</div></div>
+            <div class="cost-box"><div class="cost-box-label">With Digital Tracking</div><div class="cost-box-val green">$1-5</div></div>
+            <div class="cost-box"><div class="cost-box-label">Throughput Gain</div><div class="cost-box-val green">+2-4 pts/day</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 6 -->
+      <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge ma">06</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Rooming: Vitals, Chief Complaint &amp; Medication Reconciliation</div>
+            <div class="step-meta">
+              <span class="step-personnel ma">Medical Assistant</span>
+              <span class="step-time">5-10 min</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-6</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">MA rooms the patient, obtains vital signs (BP, HR, SpO2, pain scale, height/weight for BMI), confirms the chief complaint and date of symptom onset, reviews the completed intake questionnaire with the patient, and performs medication and allergy reconciliation. Functional status instruments (VAS, ODI, PROMIS) reviewed or administered if not completed pre-visit.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Spine-Specific Data Points</div>
+            <div class="detail-text">Neurogenic symptoms requiring immediate physician notification: new or progressive bowel/bladder dysfunction, saddle anesthesia, bilateral lower extremity weakness, gait instability. These findings indicate possible cauda equina syndrome and mandate urgent physician assessment prior to routine rooming completion.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">MA Cost / Step</div><div class="cost-box-val">$2-6</div></div>
+            <div class="cost-box"><div class="cost-box-label">Rate</div><div class="cost-box-val">$0.40-0.60/min</div></div>
+            <div class="cost-box"><div class="cost-box-label">Annual (5 days/wk)</div><div class="cost-box-val">$5,200-15,600</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 6b -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)" style="border-left: 3px solid rgba(192,132,252,0.5); margin-left: 20px;">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge physician">6b</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Physician Pre-Encounter Chart Review &amp; Imaging Docket Preparation</div>
+            <div class="step-meta">
+              <span class="step-personnel physician">Physician</span>
+              <span class="step-time">3-10 min</span>
+              <span class="auto-pill">HIGH PRIORITY TARGET</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$9-50</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Before entering the exam room, the physician reviews all available documentation and prepares the imaging display for the patient encounter. This step occurs in the hallway, at a workstation outside the room, or in the first moments inside the room before engaging the patient. It is consistently invisible in workflow analyses because it is absorbed into the encounter time or the gap between patients, but it represents real physician time at the highest cost rate in the practice. For a new spine consultation, this pre-encounter review encompasses: referral notes and reason for visit, outside records received (pain management injection history, neurology EMG/NCS reports, PT discharge summary, prior surgical operative reports), MRI and CT reports from radiology, manually loading and formatting imaging studies in the PACS viewer, selecting the key sequences to display to the patient (axial T2 at the level of pathology, sagittal T2 for canal assessment, coronal for deformity), and reviewing the intake questionnaire and functional scores submitted by the patient.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Imaging Preparation for Patient Education</div>
+            <div class="detail-text">A meaningful portion of pre-encounter time is spent not just reviewing imaging for clinical decision-making, but configuring the display to show the patient their pathology in a comprehensible way. For lumbar disc herniation, the physician selects the axial slice showing maximum nerve root compression and the sagittal sequence showing disc height loss and foraminal stenosis. For cervical myelopathy, the sagittal T2 showing cord signal change and the axial sequence at the stenotic level. For deformity, the full-length coronal alignment view. Each of these requires the physician to manually navigate the PACS viewer, select the correct series, scroll to the correct level, and often adjust windowing or labeling before displaying. This image curation step, while clinically routine, consumes 2-4 minutes of physician time per patient and is performed entirely from scratch for each encounter with no carry-forward from prior preparation.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Documentation Review Load by Visit Type</div>
+            <div class="detail-text">New consultation with complete outside records: 5-10 min. New consultation with incomplete records (some outstanding, some just arrived): 7-12 min, with additional time lost to searching for missing items. Established patient with new imaging: 3-5 min. Post-operative follow-up: 2-4 min. Injection follow-up: 1-3 min. The review burden is highest for complex new patients with multi-system histories, prior spine surgery, and records from multiple outside facilities, which is the exact population that constitutes a spine surgeon's new consultation panel.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY (DIRECT MIRA USE CASE)</div>
+            <div class="detail-text">An AI pre-encounter docket agent assembles everything the physician needs before entering the room into a single structured view, configured to match each physician's documented preferences for information hierarchy and imaging display. The docket includes: a one-paragraph clinical summary synthesized from the referral note, outside records, and intake questionnaire; a chronological treatment history extracted from pain management and PT notes; imaging findings abstracted from radiology reports with key measurements (canal diameter, disc height, Cobb angle); a pre-loaded imaging display with the physician's preferred sequences and levels already selected based on the documented diagnosis; and a flag for any missing items (outstanding records, unread studies, incomplete intake). The physician reviews the docket in 60-90 seconds rather than assembling it manually in 3-10 minutes. Over a 30-patient clinic day with 50% new consultations, this recovers 45-75 minutes of physician time daily. At $4/min loaded cost, that is $180-$300 per clinic day in recovered physician capacity, or $45,000-$75,000 annually on a 250-day schedule.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Physician Time / New Patient</div><div class="cost-box-val red">$9-50</div></div>
+            <div class="cost-box"><div class="cost-box-label">With AI Docket</div><div class="cost-box-val green">$1.50-6</div></div>
+            <div class="cost-box"><div class="cost-box-label">Annual Recovery (250 days)</div><div class="cost-box-val green">$45K-$75K</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 7 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge physician">07</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Physician Encounter: History, Exam &amp; Assessment</div>
+            <div class="step-meta">
+              <span class="step-personnel physician">Physician</span>
+              <span class="step-time">15-30 min</span>
+              <span class="auto-pill">AI SCRIBE</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$45-150</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Physician reviews history of present illness, symptom trajectory, prior treatment (physical therapy, injections, prior surgery), and functional limitations. Performs focused spine examination including neurological assessment (motor strength by myotome, sensation by dermatome, reflexes), provocative testing (SLR, Spurling, Lhermitte), and gait assessment. Reviews imaging in context of clinical findings. Formulates diagnosis and treatment plan.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Documentation Standard</div>
+            <div class="detail-text">E/M level 99204 (new, moderate MDM) is appropriate for most new spine consultations. Documentation must support moderate complexity: at least two diagnoses or management options reviewed, independent interpretation of imaging, and discussion of surgical vs. conservative options. Total encounter time including documentation must be captured if billing by time rather than MDM.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Ambient AI scribe captures the full physician-patient encounter, generates a structured SOAP note, and auto-populates the HPI, examination findings, assessment, and plan sections. CDI assistant suggests appropriate E/M level based on documented complexity. Reduces post-encounter documentation time by 5-10 min, allowing additional patient capacity without reducing interaction quality.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Physician Time</div><div class="cost-box-val red">$45-150</div></div>
+            <div class="cost-box"><div class="cost-box-label">Revenue Generated</div><div class="cost-box-val green">$117-160</div></div>
+            <div class="cost-box"><div class="cost-box-label">Additional Capacity (AI Scribe)</div><div class="cost-box-val green">+2-3 pts/day</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 8 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge physician">08</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Visit Note Documentation &amp; E/M Level Selection</div>
+            <div class="step-meta">
+              <span class="step-personnel physician">Physician</span>
+              <span class="step-time">5-15 min</span>
+              <span class="auto-pill">CDI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$15-75</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Physician finalizes and signs the visit note, selects the appropriate E/M code (by medical decision-making complexity or total encounter time), and assigns relevant ICD-10 diagnosis codes. Procedure codes are selected for any in-office procedures performed (injections, aspirations). Modifier requirements are evaluated (Modifier 25 for significant, separate E/M on injection visit day).</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Common Coding Errors</div>
+            <div class="detail-text">Undercoding (99213 documented when 99214 is clearly supported), failure to document time when billing by time, omission of Modifier 25 when E/M accompanies injection, incorrect ICD-10 specificity (M54.5 lumbar pain vs. M51.16 disc herniation with radiculopathy), and failure to document medical necessity linkage between diagnosis and procedure.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Clinical documentation integrity (CDI) AI analyzes the completed note and suggests the appropriate E/M level with supporting rationale, recommends the most specific ICD-10 codes based on documented findings, flags missing modifier requirements, and identifies documentation gaps before note signing. Studies show AI-assisted CDI increases E/M capture accuracy by 12-18% without upcoding exposure.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Undercoding Loss / Pt</div><div class="cost-box-val red">$32-51</div></div>
+            <div class="cost-box"><div class="cost-box-label">CDI Recovery Rate</div><div class="cost-box-val green">12-18%</div></div>
+            <div class="cost-box"><div class="cost-box-label">Annual Recovery (30 pts/day)</div><div class="cost-box-val green">$24K-60K</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 9 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-physician-app"><span class="split-text">09</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Post-Encounter Orders: Imaging, Injections, PT, Referrals &amp; Surgical Booking</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">Physician / APP</span>
+              <span class="step-time">5-10 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$8-25</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Place orders generated by the assessment and plan: follow-up imaging (MRI, CT myelogram, DEXA), injection referrals (ESI, TFESI, facet injections) with payer-specific documentation requirements, physical therapy referral with diagnosis and precaution notation, durable medical equipment (TLSO brace, cervical collar, cane), medication prescriptions, and surgical booking if indicated. Each order category has distinct authorization requirements. In current practice, the physician or APP manually translates the verbal or dictated plan into discrete order entries, one at a time, in the EHR order entry interface.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Surgical Booking Triggers</div>
+            <div class="detail-text">When surgery is indicated, the following must be initiated at or immediately after the encounter: surgical consent documentation, OR scheduling request with procedure name and estimated time, anesthesia pre-assessment referral, preoperative lab orders, prior authorization initiation for the surgical procedure (see Preoperative Pathway), and implant vendor notification if non-standard hardware is anticipated. Each of these is a separate manual action in most current EHR configurations.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Current Friction Points</div>
+            <div class="detail-text">Order entry at the end of a busy clinic session is a high-error-rate task. Fatigue, interruptions, and time pressure contribute to orders being placed with incorrect diagnosis linkage, missing authorization flags, wrong laterality, or omitted entirely. Physical therapy referrals sent without precaution notation (post-laminectomy restrictions, weight-bearing limits) create downstream safety risks. Injection referrals sent without payer-required conservative treatment documentation result in prior authorization denials that loop back to the billing workflow. Surgical booking initiated without complete preop order sets delays the case by days.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY — CONDITIONAL ON EHR INTEGRATION</div>
+            <div class="detail-text">This step is automatable, but the automation is contingent on a specific architectural requirement: the AI scribe must produce structured, computable output that the EHR can act on, not just readable text. A scribe that generates a narrative note does not enable automated order entry. A scribe with deep EHR integration that parses the assessment and plan into discrete structured data fields — diagnosis codes, order intents, referral targets, laterality, urgency — can trigger a pre-populated order set for physician review and one-click signature. When that integration exists, the AI can: draft the complete order set from the documented plan, pre-populate each referral with the required diagnosis codes and supporting documentation, flag orders that will require prior authorization and initiate the auth request, and queue the surgical booking workflow with all dependent steps (anesthesia referral, preop labs, vendor notification) triggered automatically. The physician reviews and signs the order set rather than building it from scratch. Current EHR platforms with varying levels of this capability include Epic with integrated ambient AI modules, Nuance DAX with Epic Orders integration, and Ambience AutoCDI with order suggestion. The key product differentiation for Mira is whether the AI layer can write back to the EHR in structured form, not just generate a readable note. Estimated time savings when fully integrated: 3-8 minutes of physician and APP time per encounter, with a secondary benefit of significant reduction in order-related denials and missing documentation errors.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost / Encounter</div><div class="cost-box-val red">$8-25</div></div>
+            <div class="cost-box"><div class="cost-box-label">With EHR-Integrated AI</div><div class="cost-box-val green">$2-6</div></div>
+            <div class="cost-box"><div class="cost-box-label">Denial Prevention Value</div><div class="cost-box-val green">$50-300 / case</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 10 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-ma-bo"><span class="split-text">10</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Consultation Note Transmission, Outbound Referrals &amp; Portal Coordination</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">MA / Back Office</span>
+              <span class="step-time">10-30 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$3-15</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">This step encompasses all outbound document transmission and referral coordination triggered by the signed encounter note. It is the outbound mirror of Step 1 and generates a comparable volume of paper and portal activity. The signed note must be transmitted to the referring provider, but it also serves as the source document for any outbound referrals ordered during the visit. A single complex spine consultation can generate 3-5 separate outbound transmissions: consultation note to the referring PCP, physical therapy referral with clinical notes, pain management referral for injection series, pain psychology referral for surgical pre-clearance, and specialist co-management referral (cardiology, endocrinology). Each transmission requires its own routing logic depending on the receiving provider's preferred method.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Referring Provider Note Transmission</div>
+            <div class="detail-text">Consultation note must be transmitted to the referring provider via fax, direct EHR message, or CommonWell/Carequality-enabled health information exchange. Note must include patient identification, referring provider identification, visit date, primary diagnosis with ICD-10 code, assessment summary, recommended treatment plan, and follow-up timeline. CMS requires timely communication of specialist findings to PCPs for coordinated care documentation. Many practices default to faxing the full visit note, which is a high-volume paper output in a 30-patient clinic day.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Outbound Referral Routing Complexity</div>
+            <div class="detail-text">Each outbound referral requires the MA or back office staff to: identify the correct receiving provider or facility, locate their fax number or portal address, compile the required supporting documentation (relevant chart sections, imaging reports, prior operative notes, insurance information), generate the referral authorization form, transmit to the receiving provider, and document the referral in the EHR with a tracking note. For providers who receive referrals through online portals (Availity, NaviMedix, payer-specific portals), staff must log in to each portal separately, complete the portal-specific intake form, upload supporting documents one at a time, and submit. This is step-for-step the same workflow burden as Step 1, but in reverse and repeated 3-5 times per complex encounter.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">On note signing, AI workflow engine can auto-route the consultation note to the documented referring provider via their preferred transmission method without staff action. For outbound referrals, AI can pre-populate each referral form from the signed note and chart data, compile the required supporting document package per referral type, and queue for MA review and one-click submission rather than requiring staff to build each referral from scratch. For portal-based referrals, AI agents can navigate the portal intake workflow, upload documents, and confirm submission with a tracking number. Estimated time savings: 6-24 minutes per complex encounter depending on referral volume. Over 250 clinic days at 15 complex encounters per day, this represents 375-1,500 MA hours annually.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost / Complex Encounter</div><div class="cost-box-val red">$6-15</div></div>
+            <div class="cost-box"><div class="cost-box-label">With AI Referral Agent</div><div class="cost-box-val green">$1-3</div></div>
+            <div class="cost-box"><div class="cost-box-label">Annual Staff Hours Recovered</div><div class="cost-box-val green">375-1,500 hrs</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- STEP 11 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-ma-bo"><span class="split-text">11</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Follow-Up Scheduling, After-Visit Summary, Patient Education &amp; Reputation Management</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">MA / Back Office</span>
+              <span class="step-time">5-10 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-5</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Follow-Up Scheduling</div>
+            <div class="detail-text">Schedule follow-up appointment per physician instructions: post-injection return at 2-4 weeks, post-operative return at 2 weeks, conservative management at 4-6 weeks, imaging results review as a telephone encounter or in-person visit per physician preference. Confirm appointment with patient before departure and send automated reminder sequence (72-hour and 24-hour SMS/email).</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">After-Visit Summary</div>
+            <div class="detail-text">Meaningful Use and MIPS requirements mandate provision of a clinical summary to the patient. The AVS must include the problem list, current medications, care plan, ordered tests, follow-up instructions, and contact information. With an AI scribe generating the visit note in real time, the AVS can be auto-generated from the signed note immediately at encounter close, formatted in plain language at a 6th-grade readability level. This eliminates the manual AVS assembly step entirely. The physician or MA reviews and releases with a single confirmation action. AVS delivery via the patient portal simultaneously satisfies Meaningful Use documentation requirements and reduces paper handout printing costs.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Patient Outreach &amp; Education</div>
+            <div class="detail-text">Condition-specific educational materials should be provided at or following the encounter based on the documented diagnosis and planned treatment: pre-surgical education for surgical candidates (procedure description, expected recovery, physical therapy protocol, activity restrictions), injection education for injection-track patients (what to expect, response timeline, follow-up instructions), conservative management education for non-surgical patients (PT goals, activity modification, red flag symptoms requiring urgent return). These materials are most effective when delivered digitally via patient portal or SMS link so the patient can reference them at home rather than relying on a paper handout collected during a high-information visit. Personalized, diagnosis-specific materials outperform generic brochures in patient recall and satisfaction measures.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Reputation Management &amp; Review Request</div>
+            <div class="detail-text">Patient satisfaction and online review volume are directly linked to physician and practice visibility in local search results and health system referral networks. Platforms such as Social Climb, BirdEye, Podium, and Reputation.com automate review request delivery via SMS or email triggered at checkout or after a defined post-visit interval (typically 2-24 hours). These platforms route satisfied patients to Google, Healthgrades, Zocdoc, and Vitals review submission, and intercept negative experiences for internal service recovery before public posting. Review request timing and channel must comply with HIPAA; requests must not include appointment-specific information in the message text. For a surgeon with 30 encounters per day, even a 15% review conversion rate generates 4-5 new reviews per clinic day, compounding over time into a durable referral asset. Review volume and recency are the primary algorithmic ranking factors on Google Maps and Healthgrades for local physician search.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">AI scribe auto-generates the AVS from the signed note with no staff input required beyond a release confirmation. AI patient engagement agent delivers condition-specific educational content via the patient's preferred channel (portal, SMS, email) within minutes of visit close, triggered by the diagnosis codes documented in the encounter. Review request platforms (Social Climb, BirdEye, Podium) integrate directly with the practice management system to trigger HIPAA-compliant review requests at checkout without staff action. Combined, these three automation outputs require approximately 30 seconds of staff time per patient versus the current 5-10 minutes of manual assembly and delivery.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Current Cost / Encounter</div><div class="cost-box-val red">$2-5</div></div>
+            <div class="cost-box"><div class="cost-box-label">With Full Automation</div><div class="cost-box-val green">$0.20-0.60</div></div>
+            <div class="cost-box"><div class="cost-box-label">Review Referral Value / Mo.</div><div class="cost-box-val green">$5K-25K</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 12 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge bo">12</div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Charge Capture &amp; Coding Submission</div>
+            <div class="step-meta">
+              <span class="step-personnel bo">Back Office</span>
+              <span class="step-time">3-5 min</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$0.90-2.50</span>
+            <span>per encounter</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">Extract billable services from the signed encounter note and procedures performed: E/M code with appropriate level, in-office procedure codes (injection, aspiration, casting), applicable modifiers, and ICD-10 diagnosis codes in correct linking order. Submit charge to the practice management system for claim generation. Target claim submission window: within 48 hours of date of service.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Revenue Leakage Points</div>
+            <div class="detail-text">Manual charge entry is associated with 3-5% missed charge rates in typical practices. Common missed charges: imaging supervision and interpretation (77003 for fluoroscopic guidance), unlisted modifier applications, add-on code omissions, and failure to capture supplies used during office procedures. At 30 encounters per day and $150 average encounter value, 3-5% leakage represents $135-$225 per clinic day.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">Automated charge capture directly from the signed note eliminates manual entry entirely. AI coding audit layer cross-references the documented services against the submitted codes, flags potential undercoding and missed charges, verifies modifier accuracy, and performs NCCI edit validation before claim submission. Estimated revenue recovery: 3-5% of daily collections, with denial prevention reducing rework by 30-40%.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Missed Charge Loss / Day</div><div class="cost-box-val red">$135-225</div></div>
+            <div class="cost-box"><div class="cost-box-label">With Auto-Capture</div><div class="cost-box-val green">&lt;1% loss</div></div>
+            <div class="cost-box"><div class="cost-box-label">Annual Recovery (250 days)</div><div class="cost-box-val green">$33K-56K</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector automation"></div>
+
+      <!-- STEP 13 -->
+      <div class="step-card automation-target" data-auto="true" onclick="toggleStep(this)">
+        <div class="step-header">
+          <div class="step-num">
+            <div class="step-num-badge split split-physician-app"><span class="split-text">13</span></div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">Post-Visit Patient Communications: Phone Queue, Portal Messages &amp; Results Review</div>
+            <div class="step-meta">
+              <span class="step-personnel mixed">Physician / APP / MA</span>
+              <span class="step-time">5-30 min / patient contact</span>
+              <span class="auto-pill">AI AUTOMATION</span>
+            </div>
+          </div>
+          <div class="step-cost">
+            <span class="cost-val">$2-150</span>
+            <span>per contact (varies by personnel)</span>
+          </div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="step-detail">
+          <div class="detail-block">
+            <div class="detail-label">Task Description</div>
+            <div class="detail-text">After the clinic encounter, a continuous inbound and outbound communication queue accumulates requiring triage, response, and documentation. This step is not bounded to a single encounter — it runs in parallel across all patients seen in the current and prior visits. Sources of patient communication include: Epic MyChart messages, Epic telephone encounter voicemails, practice phone lines routed to MA or front desk, patient portal secure messages, and after-hours answering service callbacks. Volume in an active spine practice averages 20-60 patient contacts per clinic day across all channels, each requiring a response within a defined turnaround window.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Communication Categories Requiring Physician or APP Response</div>
+            <div class="detail-text">MRI or advanced imaging results review and communication: physician or APP must review the completed study, interpret findings in the clinical context of the prior visit, and communicate results to the patient with a treatment recommendation or next step. This constitutes a billable telephone or portal encounter (99441-99443 for telephone, CPT 99421-99423 for online digital E/M) when criteria are met. Prior authorization status updates: patients and staff require communication when auth is approved, denied, or pending additional documentation. Post-injection follow-up calls: typically 24-72 hours after procedure to assess response, adverse events, and next-step recommendation. Medication question management: refill requests, side effect questions, and drug interaction inquiries requiring clinical review before response. Surgical scheduling questions: implant, anesthesia, pre-operative appointment, and logistics questions that surface after the surgical decision is made in clinic.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Communication Categories Routable to MA</div>
+            <div class="detail-text">Appointment rescheduling and cancellation requests. Referral status questions. Insurance and billing inquiries. Medical records release requests. Prescription refill routing to physician queue. Callback requests that require only demographic or scheduling information. Failure to correctly triage communication by clinical complexity results in physician and APP time spent on administrative tasks that do not require their licensure, and MA time spent on clinical questions that exceed their scope.</div>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">Documentation Requirement</div>
+            <div class="detail-text">Every patient contact that results in clinical advice, medication change, or treatment decision must be documented as a telephone encounter or portal message encounter in the EHR. Undocumented clinical communications create medicolegal exposure and represent missed billing opportunities. Telephone E/M codes (99441: 5-10 min, 99442: 11-20 min, 99443: 21-30 min) are billable when the call originates from an established patient, is not related to a service performed within the prior 7 days, and does not result in a decision for an E/M visit within 24 hours. Documentation failure rate for telephone encounters in typical practices is estimated at 30-50%.</div>
+          </div>
+          <div class="automation-block">
+            <div class="detail-label">AI AUTOMATION OPPORTUNITY</div>
+            <div class="detail-text">AI triage agent can receive all inbound patient communications across channels (voicemail transcription, portal message parsing, phone line routing), classify by clinical urgency and personnel tier required, and route to the appropriate queue with a structured summary. For MA-appropriate contacts, AI can draft a response for MA review and one-click send. For imaging results, AI can pre-generate a patient-facing results summary from the radiology report for physician review and approval before transmission, reducing physician drafting time from 5-10 minutes to under 60 seconds per result. For telephone encounter documentation, AI scribe captures the conversation and auto-generates a telephone encounter note with appropriate CPT code suggestion. This reduces per-contact physician and APP time by 50-70% while improving documentation completeness and capturing currently missed telephone E/M revenue. A practice with 40 daily patient contacts and a 40% documentation failure rate on billable telephone encounters loses an estimated $80-$240 per clinic day in uncaptured telephone E/M revenue alone.</div>
+          </div>
+          <div class="cost-calc">
+            <div class="cost-box"><div class="cost-box-label">Physician Contact Cost</div><div class="cost-box-val red">$15-150</div></div>
+            <div class="cost-box"><div class="cost-box-label">With AI Triage + Draft</div><div class="cost-box-val green">$5-45</div></div>
+            <div class="cost-box"><div class="cost-box-label">Missed Tel. E/M / Day</div><div class="cost-box-val red">$80-240</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end flow-container -->
+  </div><!-- end workflow-section -->
+
+  <!-- Summary Panel -->
+  <div class="summary-panel">
+    <div class="summary-title">Workflow Cost Summary: 30-Patient Clinic Day</div>
+    <div class="summary-grid">
+      <div class="summary-item physician">
+        <div class="summary-item-label">PHYSICIAN TIME</div>
+        <div class="summary-item-value">35-75 min</div>
+        <div class="summary-item-sub">$105-375 non-clinical cost</div>
+      </div>
+      <div class="summary-item bo">
+        <div class="summary-item-label">BACK OFFICE TIME</div>
+        <div class="summary-item-value">28-55 min</div>
+        <div class="summary-item-sub">$8-28 per encounter</div>
+      </div>
+      <div class="summary-item ma">
+        <div class="summary-item-label">MA TIME</div>
+        <div class="summary-item-value">10-20 min</div>
+        <div class="summary-item-sub">$4-12 per encounter</div>
+      </div>
+      <div class="summary-item savings">
+        <div class="summary-item-label">DAILY AI SAVINGS (30 PATIENTS)</div>
+        <div class="summary-item-value">$1,260-$3,750</div>
+        <div class="summary-item-sub">Across all automation targets combined</div>
+      </div>
+      <div class="summary-item savings">
+        <div class="summary-item-label">ANNUAL SAVINGS (250 CLINIC DAYS)</div>
+        <div class="summary-item-value">$315K-$937K</div>
+        <div class="summary-item-sub">Per 30-patient clinic day practice</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-label">AUTOMATION COVERAGE</div>
+        <div class="summary-item-value">14 of 16 steps</div>
+        <div class="summary-item-sub">88% of workflow steps automatable</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page-footer" style="margin-top:40px; padding-top:20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+    <div class="footer-note">
+      Data sourced from CMS 2026 Physician Fee Schedule Final Rule (CMS-1832-F).<br>
+      Cost estimates reflect loaded personnel costs; actual costs vary by market and practice configuration.<br>
+      Workflow steps derived from TDABC analysis of orthopedic spine private practice operations.<br>
+      <strong style="color:var(--text-dim);">CONFIDENTIAL | Mira Health | March 2026</strong>
+    </div>
+    <div class="mira-tag">MIRA HEALTH<br>WORKFLOW INTELLIGENCE</div>
+  </footer>
+
+</div>
+
+<script>
+  function toggleStep(card) {
+    card.classList.toggle('open');
+  }
+
+  function expandAll() {
+    document.querySelectorAll('.step-card').forEach(c => c.classList.add('open'));
+  }
+
+  function collapseAll() {
+    document.querySelectorAll('.step-card').forEach(c => c.classList.remove('open'));
+  }
+
+  let filterActive = false;
+  function toggleAutoFilter() {
+    filterActive = !filterActive;
+    const btn = document.getElementById('filterBtn');
+    btn.classList.toggle('active', filterActive);
+
+    document.querySelectorAll('.step-card').forEach(card => {
+      const isAuto = card.dataset.auto === 'true';
+      const connector = card.nextElementSibling;
+      if (filterActive) {
+        card.style.display = isAuto ? '' : 'none';
+        if (connector && connector.classList.contains('connector')) {
+          connector.style.display = isAuto ? '' : 'none';
+        }
+      } else {
+        card.style.display = '';
+        if (connector && connector.classList.contains('connector')) {
+          connector.style.display = '';
+        }
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
