@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spine Clinic AI | Mira Health</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4ef;
+  --ink: #1a1612;
+  --ink-mid: #4a4540;
+  --ink-light: #9a9088;
+  --ink-faint: #e8e3da;
+  --red: #c0392b;
+  --red-bg: #fdf1f0;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --physician: #7c3aed;
+  --ma: #b45309;
+  --bo: #c2410c;
+  --app: #0369a1;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.top-bar {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.top-logo {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+
+.top-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+}
+
+/* ── Progress dots ── */
+.progress-wrap {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.pdot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pdot.active {
+  background: rgba(255,255,255,0.7);
+  transform: scale(1.4);
+}
+
+.pdot.seen {
+  background: rgba(255,255,255,0.35);
+}
+
+/* ── Stage / carousel ── */
+.stage {
+  width: 100%;
+  max-width: 860px;
+  position: relative;
+  height: 420px;
+  perspective: 1200px;
+}
+
+/* Cards stack behind active */
+.card-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity  0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* States */
+.card[data-state="active"] {
+  transform: translateY(0) scale(1) rotateX(0deg);
+  opacity: 1;
+  z-index: 10;
+  pointer-events: all;
+}
+
+.card[data-state="next"] {
+  transform: translateY(14px) scale(0.97) rotateX(1.5deg);
+  opacity: 0.5;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.card[data-state="next2"] {
+  transform: translateY(24px) scale(0.94) rotateX(2.5deg);
+  opacity: 0.25;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.card[data-state="gone-left"] {
+  transform: translateX(-110%) rotateY(12deg) scale(0.9);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card[data-state="gone-right"] {
+  transform: translateX(110%) rotateY(-12deg) scale(0.9);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card[data-state="hidden"] {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transform: translateY(30px) scale(0.92);
+}
+
+/* ── Card left panel ── */
+.card-left {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  background: #f0ebe2;
+  border-right: 1px solid var(--ink-faint);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-left::after {
+  content: attr(data-num);
+  position: absolute;
+  bottom: -16px;
+  right: -8px;
+  font-family: var(--font-display);
+  font-size: 120px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-step-num {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: rgba(0,0,0,0.28);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.card-step-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+
+.card-who {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-bottom: 6px;
+}
+
+.who-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-time {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-light);
+  background: rgba(0,0,0,0.05);
+  border-radius: 3px;
+  padding: 3px 8px;
+  width: fit-content;
+  margin-bottom: auto;
+}
+
+.card-icon {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* ── Card right panel ── */
+.card-right {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+}
+
+.card-block {
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.block-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.block-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  color: rgba(0,0,0,0.3);
+}
+
+.block-text {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.prob-block {
+  background: var(--red-bg);
+  border: 1px solid rgba(192,57,43,0.14);
+}
+
+.sol-block {
+  background: var(--green-bg);
+  border: 1px solid rgba(22,163,74,0.18);
+}
+
+.card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 11px 18px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.stat-desc {
+  font-size: 12px;
+  color: var(--ink-light);
+  line-height: 1.35;
+}
+
+/* ── Bottom nav ── */
+.bottom-nav {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.nav-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.nav-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.counter {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.1em;
+}
+
+/* Auto-play progress bar */
+.autoplay-bar {
+  width: 100%;
+  max-width: 860px;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 1px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.autoplay-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.25);
+  border-radius: 1px;
+  width: 0%;
+  transition: width linear;
+}
+
+/* Pause on hover of card */
+.stage:hover .autoplay-fill {
+  transition: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-logo">Mira Health</div>
+  <div class="top-title">AI Tools for Spine Clinic Workflow</div>
+  <div class="progress-wrap" id="progressDots"></div>
+</div>
+
+<div class="stage" id="stage">
+  <!-- Cards injected by JS -->
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn" id="prevBtn" onclick="go(-1)">← Back</button>
+  <span class="counter" id="counter"></span>
+  <button class="nav-btn" id="nextBtn" onclick="go(1)">Next →</button>
+</div>
+
+<div class="autoplay-bar"><div class="autoplay-fill" id="autoFill"></div></div>
+
+<script>
+const STEPS = [
+  {
+    num: '01', name: 'Referral\nIntake', who: 'Back Office', whoColor: '#c2410c', time: '5–10 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="4" y="14" width="36" height="46" rx="4" fill="rgba(194,65,12,0.08)" stroke="rgba(194,65,12,0.3)" stroke-width="1.5"/>
+      <rect x="10" y="10" width="28" height="6" rx="2" fill="rgba(194,65,12,0.15)" stroke="rgba(194,65,12,0.3)" stroke-width="1"/>
+      <rect x="13" y="2" width="18" height="12" rx="2" fill="white" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+      <line x1="16" y1="5" x2="28" y2="5" stroke="rgba(0,0,0,0.15)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="16" y1="9" x2="26" y2="9" stroke="rgba(0,0,0,0.12)" stroke-width="1" stroke-linecap="round"/>
+      <circle cx="30" cy="30" r="2.5" fill="rgba(194,65,12,0.3)"/><circle cx="22" cy="30" r="2.5" fill="rgba(194,65,12,0.3)"/><circle cx="14" cy="30" r="2.5" fill="rgba(194,65,12,0.3)"/>
+      <circle cx="30" cy="40" r="2.5" fill="rgba(194,65,12,0.3)"/><circle cx="22" cy="40" r="2.5" fill="rgba(194,65,12,0.3)"/><circle cx="14" cy="40" r="2.5" fill="rgba(194,65,12,0.3)"/>
+      <text x="22" y="68" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(194,65,12,0.5)">FAX</text>
+      <rect x="52" y="8" width="34" height="44" rx="3" fill="rgba(194,65,12,0.06)" stroke="rgba(194,65,12,0.2)" stroke-width="1.2" transform="rotate(-4 52 8)"/>
+      <rect x="54" y="6" width="34" height="44" rx="3" fill="rgba(194,65,12,0.06)" stroke="rgba(194,65,12,0.2)" stroke-width="1.2" transform="rotate(-1 54 6)"/>
+      <rect x="56" y="4" width="34" height="44" rx="3" fill="white" stroke="rgba(194,65,12,0.35)" stroke-width="1.5"/>
+      <line x1="62" y1="14" x2="84" y2="14" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="62" y1="20" x2="80" y2="20" stroke="rgba(0,0,0,0.10)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="62" y1="26" x2="82" y2="26" stroke="rgba(0,0,0,0.10)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="73" y="68" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(194,65,12,0.5)">ORDERS</text>
+      <circle cx="116" cy="26" r="18" fill="rgba(194,65,12,0.06)" stroke="rgba(194,65,12,0.25)" stroke-width="1.5"/>
+      <path d="M108 20 Q106 24 108 30 Q111 37 116 38 Q121 40 124 37 L122 33 Q120 32 118 33 Q117 35 115 33 Q112 30 112 26 Q112 24 114 22Z" fill="rgba(194,65,12,0.25)" stroke="rgba(194,65,12,0.5)" stroke-width="1"/>
+      <path d="M122 22 Q125 25 122 28" fill="none" stroke="rgba(194,65,12,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="116" y="68" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(194,65,12,0.5)">VOICEMAIL</text>
+      <circle cx="70" cy="56" r="8" fill="rgba(194,65,12,0.85)"/>
+      <text x="70" y="60" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" font-weight="700" fill="white">47</text>
+    </svg>`,
+    problem: '47 faxes, orders, and voicemails arrive daily. Staff reads each by hand.',
+    solution: 'AI reads, sorts, and routes every referral automatically.',
+    stat: '2–4 hrs', statDesc: 'of back office time recovered daily'
+  },
+  {
+    num: '02', name: 'Insurance\nVerification', who: 'Back Office', whoColor: '#c2410c', time: '10–20 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="8" y="10" width="72" height="46" rx="6" fill="rgba(3,105,161,0.08)" stroke="rgba(3,105,161,0.35)" stroke-width="1.5"/>
+      <rect x="8" y="20" width="72" height="10" fill="rgba(3,105,161,0.15)"/>
+      <rect x="18" y="34" width="14" height="10" rx="2" fill="rgba(3,105,161,0.25)" stroke="rgba(3,105,161,0.4)" stroke-width="1"/>
+      <line x1="38" y1="36" x2="72" y2="36" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="38" y1="42" x2="66" y2="42" stroke="rgba(0,0,0,0.08)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="44" y="64" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(3,105,161,0.5)">INSURANCE CARD</text>
+      <circle cx="112" cy="32" r="20" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.3)" stroke-width="1.5"/>
+      <line x1="102" y1="22" x2="122" y2="42" stroke="rgba(192,57,43,0.7)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="122" y1="22" x2="102" y2="42" stroke="rgba(192,57,43,0.7)" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="112" y="64" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(192,57,43,0.5)">EXPIRED</text>
+    </svg>`,
+    problem: 'Expired coverage found at check-in. Visit cancelled.',
+    solution: 'Coverage verified automatically the day before the appointment.',
+    stat: '30 sec', statDesc: 'vs. 10–20 min manual — per patient, every day'
+  },
+  {
+    num: '03a', name: 'Pre-Visit\nScreening', who: 'Back Office', whoColor: '#c2410c', time: '5–20 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="8" y="4" width="56" height="60" rx="5" fill="white" stroke="rgba(180,83,9,0.35)" stroke-width="1.5"/>
+      <rect x="8" y="4" width="56" height="12" rx="5" fill="rgba(180,83,9,0.12)"/>
+      <rect x="8" y="10" width="56" height="6" fill="rgba(180,83,9,0.12)"/>
+      <circle cx="20" cy="26" r="5" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.5)" stroke-width="1.2"/>
+      <path d="M17 26l2 2 4-4" fill="none" stroke="rgba(22,163,74,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="30" y1="26" x2="56" y2="26" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="38" y="24" font-family="Outfit,sans-serif" font-size="7.5" fill="rgba(0,0,0,0.3)">6 wks PT</text>
+      <circle cx="20" cy="40" r="5" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.5)" stroke-width="1.2"/>
+      <path d="M17 40l2 2 4-4" fill="none" stroke="rgba(22,163,74,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="30" y1="40" x2="56" y2="40" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="38" y="38" font-family="Outfit,sans-serif" font-size="7.5" fill="rgba(0,0,0,0.3)">Injections</text>
+      <circle cx="20" cy="54" r="5" fill="rgba(192,57,43,0.1)" stroke="rgba(192,57,43,0.4)" stroke-width="1.2"/>
+      <line x1="17" y1="51" x2="23" y2="57" stroke="rgba(192,57,43,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="23" y1="51" x2="17" y2="57" stroke="rgba(192,57,43,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="38" y="52" font-family="Outfit,sans-serif" font-size="7.5" fill="rgba(192,57,43,0.6)">MRI missing</text>
+      <path d="M70 34 L82 34" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M79 30 L83 34 L79 38" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="88" y="12" width="44" height="46" rx="5" fill="white" stroke="rgba(180,83,9,0.3)" stroke-width="1.5"/>
+      <rect x="92" y="18" width="36" height="24" rx="2" fill="rgba(192,57,43,0.04)"/>
+      <line x1="92" y1="30" x2="128" y2="30" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+      <line x1="110" y1="18" x2="110" y2="42" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+      <rect x="111" y="31" width="16" height="10" rx="1" fill="rgba(192,57,43,0.2)" stroke="rgba(192,57,43,0.4)" stroke-width="1"/>
+      <line x1="113" y1="33" x2="125" y2="39" stroke="rgba(192,57,43,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="125" y1="33" x2="113" y2="39" stroke="rgba(192,57,43,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="110" y="58" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(192,57,43,0.5)">SLOT BLOCKED</text>
+    </svg>`,
+    problem: 'Patient scheduled without PT or MRI. Surgeon can\'t see them. Slot wasted.',
+    solution: 'AI checks criteria and messages the referral source to order missing PT or MRI first.',
+    stat: '0', statDesc: 'wasted surgical consultation slots'
+  },
+  {
+    num: '03b', name: 'Scheduling\nIntelligence', who: 'Back Office', whoColor: '#c2410c', time: 'ED referral',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="6" y="6" width="52" height="58" rx="5" fill="white" stroke="rgba(192,57,43,0.35)" stroke-width="1.5"/>
+      <rect x="6" y="6" width="52" height="12" rx="5" fill="rgba(192,57,43,0.12)"/>
+      <rect x="6" y="12" width="52" height="6" fill="rgba(192,57,43,0.12)"/>
+      <text x="32" y="20" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(192,57,43,0.6)">ED REPORT</text>
+      <text x="14" y="34" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(0,0,0,0.5)">L2 Fracture</text>
+      <text x="14" y="43" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">No neuro deficits</text>
+      <text x="14" y="52" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">Braced in ED</text>
+      <path d="M64 34 L76 34" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M73 30 L77 34 L73 38" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="82" y="8" width="52" height="54" rx="5" fill="white" stroke="rgba(192,57,43,0.3)" stroke-width="1.5"/>
+      <rect x="82" y="8" width="52" height="12" rx="5" fill="rgba(192,57,43,0.1)"/>
+      <rect x="82" y="14" width="52" height="6" fill="rgba(192,57,43,0.1)"/>
+      <text x="108" y="21" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(192,57,43,0.5)">NEXT DAY</text>
+      <text x="108" y="42" text-anchor="middle" font-family="Outfit,sans-serif" font-size="26" font-weight="900" fill="rgba(192,57,43,0.7)">+1</text>
+      <line x1="86" y1="52" x2="130" y2="62" stroke="rgba(192,57,43,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="130" y1="52" x2="86" y2="62" stroke="rgba(192,57,43,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`,
+    problem: 'New L2 compression fracture, braced in ED, no deficits. Booked for clinic follow-up next day.',
+    solution: 'Follow-up at 2–3 weeks with standing X-rays to monitor healing.',
+    stat: '2–3 wks', statDesc: 'correct follow-up window for stable vertebral fracture'
+  },
+  {
+    num: '04', name: 'Chart Prep &\nOutside Records', who: 'MA / Back Office', whoColor: '#b45309', time: '20–60 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <circle cx="36" cy="34" r="28" fill="rgba(180,83,9,0.06)" stroke="rgba(180,83,9,0.25)" stroke-width="1.5"/>
+      <circle cx="36" cy="34" r="16" fill="rgba(180,83,9,0.04)" stroke="rgba(180,83,9,0.15)" stroke-width="1"/>
+      <circle cx="36" cy="34" r="4" fill="white" stroke="rgba(180,83,9,0.25)" stroke-width="1"/>
+      <path d="M14 20 Q36 12 58 20" fill="none" stroke="rgba(180,83,9,0.15)" stroke-width="1.5"/>
+      <path d="M12 30 Q36 22 60 30" fill="none" stroke="rgba(3,105,161,0.12)" stroke-width="1.2"/>
+      <text x="36" y="38" text-anchor="middle" font-family="Outfit,sans-serif" font-size="16" font-weight="700" fill="rgba(192,57,43,0.45)">?</text>
+      <text x="36" y="66" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(180,83,9,0.45)">OUTSIDE CD</text>
+      <path d="M72 34 L84 34" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M81 30 L85 34 L81 38" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="90" y="10" width="44" height="54" rx="5" fill="white" stroke="rgba(22,163,74,0.4)" stroke-width="1.5"/>
+      <rect x="90" y="10" width="44" height="12" rx="5" fill="rgba(22,163,74,0.12)"/>
+      <rect x="90" y="16" width="44" height="6" fill="rgba(22,163,74,0.12)"/>
+      <text x="112" y="22" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" font-weight="600" fill="rgba(22,163,74,0.6)">CHART READY</text>
+      <circle cx="102" cy="36" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.5)" stroke-width="1"/>
+      <path d="M100 36l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="102" cy="47" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.5)" stroke-width="1"/>
+      <path d="M100 47l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="102" cy="58" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.5)" stroke-width="1"/>
+      <path d="M100 58l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+    problem: 'Patient arrives. MRI is on a CD no one retrieved. Physician hunts for records during the visit.',
+    solution: 'AI requests records at scheduling. Messages patient to bring CD. Everything in chart before arrival.',
+    stat: '15–30 min', statDesc: 'of physician time recovered per new patient'
+  },
+  {
+    num: '05', name: 'Arrival &\nCheck-In', who: 'Back Office', whoColor: '#c2410c', time: '5–15 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <circle cx="40" cy="18" r="12" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.3)" stroke-width="1.5"/>
+      <path d="M24 50 Q24 32 40 30 Q56 32 56 50" fill="rgba(180,83,9,0.07)" stroke="rgba(180,83,9,0.25)" stroke-width="1.2"/>
+      <rect x="28" y="52" width="24" height="16" rx="3" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.3)" stroke-width="1.2"/>
+      <path d="M34 52 L34 48 Q40 44 46 48 L46 52" fill="none" stroke="rgba(180,83,9,0.3)" stroke-width="1.2"/>
+      <circle cx="40" cy="57" r="6" fill="white" stroke="rgba(180,83,9,0.35)" stroke-width="1"/>
+      <circle cx="40" cy="57" r="2" fill="rgba(180,83,9,0.2)"/>
+      <text x="40" y="70" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(180,83,9,0.5)">CD IN BAG</text>
+      <path d="M62 32 Q78 26 86 32 Q94 38 88 46 L78 46 L72 52 L74 46 Q62 46 60 40 Q58 34 62 32Z" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.3)" stroke-width="1.2"/>
+      <text x="77" y="43" text-anchor="middle" font-family="Outfit,sans-serif" font-size="16" font-weight="700" fill="rgba(192,57,43,0.45)">!</text>
+      <rect x="96" y="40" width="38" height="24" rx="4" fill="rgba(22,163,74,0.06)" stroke="rgba(22,163,74,0.3)" stroke-width="1.2"/>
+      <text x="115" y="53" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(22,163,74,0.5)">CHECK-IN</text>
+      <path d="M98 30 Q110 22 122 28 Q130 32 128 40 L116 40 L110 46 L112 40 Q100 40 98 36 Q96 32 98 30Z" fill="rgba(22,163,74,0.08)" stroke="rgba(22,163,74,0.3)" stroke-width="1.2"/>
+      <text x="114" y="36" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" font-weight="600" fill="rgba(22,163,74,0.5)">Bring a CD?</text>
+    </svg>`,
+    problem: 'Patient forgets to mention the CD in their bag. Imported after physician already entered the room.',
+    solution: 'Staff prompted at check-in to collect CDs. Import queue starts immediately.',
+    stat: '\u2193 delays', statDesc: 'eliminates one of the most common causes of same-day clinic delays'
+  },
+  {
+    num: '05b', name: 'X-Ray &\nWayfinding', who: 'MA / Back Office', whoColor: '#b45309', time: '10–20 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="4" y="6" width="38" height="28" rx="3" fill="rgba(3,105,161,0.06)" stroke="rgba(3,105,161,0.3)" stroke-width="1.2"/>
+      <text x="23" y="22" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(3,105,161,0.5)">X-RAY</text>
+      <rect x="51" y="6" width="38" height="28" rx="3" fill="rgba(22,163,74,0.06)" stroke="rgba(22,163,74,0.3)" stroke-width="1.2"/>
+      <text x="70" y="16" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(22,163,74,0.5)">WAITING</text>
+      <text x="70" y="26" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(22,163,74,0.5)">AREA</text>
+      <rect x="98" y="6" width="38" height="28" rx="3" fill="rgba(192,57,43,0.06)" stroke="rgba(192,57,43,0.3)" stroke-width="1.2"/>
+      <text x="117" y="22" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(192,57,43,0.4)">WRONG</text>
+      <path d="M42 20 L52 20" stroke="rgba(22,163,74,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+      <path d="M49 16 L53 20 L49 24" fill="none" stroke="rgba(22,163,74,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="117" cy="52" r="8" fill="rgba(192,57,43,0.15)" stroke="rgba(192,57,43,0.4)" stroke-width="1.5"/>
+      <text x="117" y="56" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" fill="rgba(192,57,43,0.6)">?</text>
+      <circle cx="36" cy="52" r="7" fill="rgba(180,83,9,0.1)" stroke="rgba(180,83,9,0.3)" stroke-width="1.2"/>
+      <path d="M28 66 Q28 58 36 56 Q44 58 44 66" fill="rgba(180,83,9,0.06)" stroke="rgba(180,83,9,0.2)" stroke-width="1"/>
+      <circle cx="70" cy="52" r="10" fill="rgba(0,0,0,0.03)" stroke="rgba(0,0,0,0.15)" stroke-width="1.2"/>
+      <line x1="70" y1="45" x2="70" y2="52" stroke="rgba(0,0,0,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="70" y1="52" x2="76" y2="56" stroke="rgba(192,57,43,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>`,
+    problem: 'Patient gets X-rays, returns to wrong waiting area. Staff spends 5\u201310 min calling and searching.',
+    solution: 'Digital tracking board shows patient location. MA notified when imaging is complete.',
+    stat: '5\u201310 min', statDesc: 'less delay per lost patient in clinic'
+  },
+  {
+    num: '06', name: 'Rooming\n& Vitals', who: 'Medical Assistant', whoColor: '#b45309', time: '5\u201310 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="10" y="4" width="60" height="62" rx="5" fill="white" stroke="rgba(180,83,9,0.3)" stroke-width="1.5"/>
+      <rect x="10" y="4" width="60" height="12" rx="5" fill="rgba(180,83,9,0.12)"/>
+      <rect x="10" y="10" width="60" height="6" fill="rgba(180,83,9,0.12)"/>
+      <text x="40" y="18" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(180,83,9,0.6)">ODI / PROMIS</text>
+      <rect x="18" y="24" width="44" height="7" rx="2" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.1)" stroke-width="0.8"/>
+      <rect x="18" y="36" width="44" height="7" rx="2" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.1)" stroke-width="0.8"/>
+      <rect x="18" y="48" width="44" height="7" rx="2" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.1)" stroke-width="0.8"/>
+      <text x="40" y="31" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(192,57,43,0.35)">\u2014 \u2014 \u2014 \u2014</text>
+      <text x="40" y="43" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(192,57,43,0.35)">\u2014 \u2014 \u2014 \u2014</text>
+      <text x="40" y="55" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(192,57,43,0.35)">\u2014 \u2014 \u2014 \u2014</text>
+      <circle cx="110" cy="34" r="24" fill="rgba(180,83,9,0.04)" stroke="rgba(180,83,9,0.2)" stroke-width="1.2"/>
+      <line x1="110" y1="34" x2="110" y2="16" stroke="rgba(180,83,9,0.4)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="110" y1="34" x2="124" y2="42" stroke="rgba(192,57,43,0.6)" stroke-width="2" stroke-linecap="round"/>
+      <text x="110" y="66" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(180,83,9,0.4)">5 MIN LOST</text>
+    </svg>`,
+    problem: 'ODI, VAS, and PROMIS scores not completed. Physician fills gaps during encounter time.',
+    solution: 'AI pre-visit agent collects all functional scores before the patient arrives.',
+    stat: '5 min', statDesc: 'of physician encounter time recovered per patient'
+  },
+  {
+    num: '06b', name: 'Pre-Encounter\nReview', who: 'Physician', whoColor: '#7c3aed', time: '3\u201310 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="36" y="6" width="84" height="56" rx="4" fill="white" stroke="rgba(124,58,237,0.3)" stroke-width="1.5"/>
+      <rect x="36" y="6" width="84" height="12" rx="4" fill="rgba(124,58,237,0.1)"/>
+      <rect x="36" y="12" width="84" height="6" fill="rgba(124,58,237,0.1)"/>
+      <text x="78" y="20" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(124,58,237,0.6)">AI DOCKET READY</text>
+      <rect x="42" y="24" width="28" height="28" rx="2" fill="rgba(0,0,0,0.05)" stroke="rgba(0,0,0,0.1)" stroke-width="0.8"/>
+      <text x="56" y="41" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" fill="rgba(0,0,0,0.25)">MRI</text>
+      <line x1="76" y1="28" x2="114" y2="28" stroke="rgba(0,0,0,0.12)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="76" y1="35" x2="110" y2="35" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="76" y1="42" x2="112" y2="42" stroke="rgba(0,0,0,0.09)" stroke-width="1.5" stroke-linecap="round"/>
+      <rect x="76" y="48" width="38" height="6" rx="2" fill="rgba(22,163,74,0.12)" stroke="rgba(22,163,74,0.3)" stroke-width="0.8"/>
+      <text x="95" y="53" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" font-weight="600" fill="rgba(22,163,74,0.6)">Ready to see</text>
+      <circle cx="20" cy="28" r="10" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.3)" stroke-width="1.2"/>
+      <path d="M10 48 Q10 36 20 34 Q30 36 30 48" fill="rgba(124,58,237,0.06)" stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+      <path d="M28 26 L34 26" stroke="rgba(124,58,237,0.3)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+    </svg>`,
+    problem: 'Physician spends 5\u201310 min loading imaging and assembling the clinical picture before every room.',
+    solution: 'AI prepares a structured docket \u2014 imaging loaded, records summarized, key findings flagged.',
+    stat: '5\u201310 min', statDesc: 'saved per new patient before the door opens'
+  },
+  {
+    num: '07', name: 'Physician\nEncounter', who: 'Physician', whoColor: '#7c3aed', time: '15\u201330 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <circle cx="34" cy="18" r="12" fill="rgba(124,58,237,0.12)" stroke="rgba(124,58,237,0.35)" stroke-width="1.5"/>
+      <path d="M20 50 Q20 34 34 32 Q48 34 48 50" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.25)" stroke-width="1.2"/>
+      <circle cx="86" cy="18" r="12" fill="rgba(180,83,9,0.10)" stroke="rgba(180,83,9,0.3)" stroke-width="1.5"/>
+      <path d="M72 50 Q72 34 86 32 Q100 34 100 50" fill="rgba(180,83,9,0.06)" stroke="rgba(180,83,9,0.2)" stroke-width="1.2"/>
+      <path d="M50 24 Q62 18 72 24" fill="none" stroke="rgba(124,58,237,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M52 30 Q62 26 70 30" fill="none" stroke="rgba(124,58,237,0.15)" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="110" y="14" width="24" height="42" rx="6" fill="rgba(22,163,74,0.06)" stroke="rgba(22,163,74,0.3)" stroke-width="1.5"/>
+      <rect x="116" y="20" width="12" height="18" rx="6" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.4)" stroke-width="1.2"/>
+      <path d="M112 38 Q112 46 122 46 Q132 46 132 38" fill="none" stroke="rgba(22,163,74,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="122" y1="46" x2="122" y2="52" stroke="rgba(22,163,74,0.4)" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="122" y="66" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(22,163,74,0.5)">LISTENING</text>
+    </svg>`,
+    problem: 'Physician dictates notes after clinic. Documentation takes 1\u20132 hours at end of every day.',
+    solution: 'AI scribe captures the encounter in real time. Note is ready to review on room exit.',
+    stat: '1\u20132 hrs', statDesc: 'given back to the physician every clinic day'
+  },
+  {
+    num: '08', name: 'E/M Coding\n& CDI', who: 'Physician', whoColor: '#7c3aed', time: '5\u201315 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="6" y="10" width="58" height="52" rx="6" fill="rgba(192,57,43,0.06)" stroke="rgba(192,57,43,0.35)" stroke-width="1.5"/>
+      <text x="35" y="38" text-anchor="middle" font-family="Outfit,sans-serif" font-size="20" font-weight="900" fill="rgba(192,57,43,0.65)">99214</text>
+      <text x="35" y="50" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" fill="rgba(192,57,43,0.45)">$85 fac.</text>
+      <path d="M70 36 L78 36" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M75 32 L79 36 L75 40" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="82" y="10" width="58" height="52" rx="6" fill="rgba(22,163,74,0.06)" stroke="rgba(22,163,74,0.4)" stroke-width="1.5"/>
+      <text x="111" y="38" text-anchor="middle" font-family="Outfit,sans-serif" font-size="20" font-weight="900" fill="rgba(22,163,74,0.65)">99215</text>
+      <text x="111" y="50" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" fill="rgba(22,163,74,0.45)">$126 fac.</text>
+      <text x="74" y="68" text-anchor="middle" font-family="Outfit,sans-serif" font-size="10" font-weight="600" fill="rgba(22,163,74,0.6)">+$41 per visit</text>
+    </svg>`,
+    problem: 'Physician documents a 99214 when the visit clearly supports a 99215. Revenue left on the table.',
+    solution: 'AI flags the correct E/M level and missing documentation before the note is signed.',
+    stat: '$24K\u2013$60K', statDesc: 'in annual E/M recovery per physician'
+  },
+  {
+    num: '09', name: 'Orders,\nReferrals & Letters', who: 'Physician / APP', whoColor: '#7c3aed', time: '5\u201310 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="4" y="8" width="54" height="24" rx="4" fill="rgba(192,57,43,0.06)" stroke="rgba(192,57,43,0.3)" stroke-width="1.2"/>
+      <text x="28" y="20" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(0,0,0,0.45)">PT Referral</text>
+      <text x="28" y="28" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">No precautions \u2715</text>
+      <rect x="4" y="40" width="54" height="24" rx="4" fill="rgba(192,57,43,0.06)" stroke="rgba(192,57,43,0.3)" stroke-width="1.2"/>
+      <text x="28" y="52" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(0,0,0,0.45)">MRI Order</text>
+      <text x="28" y="60" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">Wrong dx code \u2715</text>
+      <path d="M64 36 L74 36" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M71 32 L75 36 L71 40" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="80" y="6" width="56" height="58" rx="5" fill="rgba(22,163,74,0.04)" stroke="rgba(22,163,74,0.3)" stroke-width="1.5"/>
+      <text x="108" y="20" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(22,163,74,0.5)">AI ORDER SET</text>
+      <circle cx="90" cy="32" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.4)" stroke-width="1"/>
+      <path d="M88 32l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="100" y1="32" x2="128" y2="32" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="90" cy="44" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.4)" stroke-width="1"/>
+      <path d="M88 44l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="100" y1="44" x2="126" y2="44" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="90" cy="56" r="4" fill="rgba(22,163,74,0.15)" stroke="rgba(22,163,74,0.4)" stroke-width="1"/>
+      <path d="M88 56l2 2 3-3" fill="none" stroke="rgba(22,163,74,0.7)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="100" y1="56" x2="128" y2="56" stroke="rgba(0,0,0,0.1)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>`,
+    problem: 'PT referral sent without precautions. Imaging ordered with wrong code. Auth denied.',
+    solution: 'AI pends the complete order set from the documented plan. Work letters drafted automatically.',
+    stat: 'EHR', statDesc: 'integration required \u2014 conditional on AI scribe write-back'
+  },
+  {
+    num: '10', name: 'Note\nTransmission', who: 'MA / Back Office', whoColor: '#b45309', time: '10\u201330 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="6" y="22" width="36" height="30" rx="5" fill="rgba(3,105,161,0.08)" stroke="rgba(3,105,161,0.3)" stroke-width="1.5"/>
+      <text x="24" y="35" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" font-weight="600" fill="rgba(3,105,161,0.5)">SIGNED</text>
+      <text x="24" y="44" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" font-weight="600" fill="rgba(3,105,161,0.5)">NOTE</text>
+      <line x1="42" y1="37" x2="58" y2="16" stroke="rgba(0,0,0,0.12)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="42" y1="37" x2="58" y2="27" stroke="rgba(0,0,0,0.12)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="42" y1="37" x2="58" y2="37" stroke="rgba(0,0,0,0.12)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="42" y1="37" x2="58" y2="47" stroke="rgba(0,0,0,0.12)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="42" y1="37" x2="58" y2="57" stroke="rgba(0,0,0,0.12)" stroke-width="1.2" stroke-linecap="round"/>
+      <rect x="60" y="10" width="34" height="12" rx="3" fill="rgba(180,83,9,0.08)" stroke="rgba(180,83,9,0.25)" stroke-width="1"/>
+      <text x="77" y="19" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">PCP fax</text>
+      <rect x="60" y="26" width="34" height="12" rx="3" fill="rgba(180,83,9,0.08)" stroke="rgba(180,83,9,0.25)" stroke-width="1"/>
+      <text x="77" y="35" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">PT portal</text>
+      <rect x="60" y="42" width="34" height="12" rx="3" fill="rgba(180,83,9,0.08)" stroke="rgba(180,83,9,0.25)" stroke-width="1"/>
+      <text x="77" y="51" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">Pain mgmt</text>
+      <rect x="60" y="58" width="34" height="12" rx="3" fill="rgba(180,83,9,0.08)" stroke="rgba(180,83,9,0.25)" stroke-width="1"/>
+      <text x="77" y="67" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(0,0,0,0.35)">Cardiology</text>
+      <text x="112" y="26" text-anchor="middle" font-family="Outfit,sans-serif" font-size="18" fill="rgba(192,57,43,0.22)">\u270d</text>
+      <text x="112" y="42" text-anchor="middle" font-family="Outfit,sans-serif" font-size="18" fill="rgba(192,57,43,0.22)">\u270d</text>
+      <text x="112" y="58" text-anchor="middle" font-family="Outfit,sans-serif" font-size="18" fill="rgba(192,57,43,0.22)">\u270d</text>
+    </svg>`,
+    problem: 'One complex visit generates 4 outbound faxes and 2 portal uploads. Each done manually.',
+    solution: 'AI auto-routes the note and assembles each referral package on note signing.',
+    stat: '375\u20131,500', statDesc: 'MA hours recovered annually'
+  },
+  {
+    num: '11', name: 'AVS, Education\n& Reviews', who: 'MA / Back Office', whoColor: '#b45309', time: '5\u201310 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="20" y="4" width="40" height="62" rx="6" fill="white" stroke="rgba(180,83,9,0.3)" stroke-width="1.5"/>
+      <rect x="24" y="10" width="32" height="44" rx="3" fill="rgba(180,83,9,0.03)"/>
+      <line x1="28" y1="18" x2="52" y2="18" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="28" y1="25" x2="48" y2="25" stroke="rgba(0,0,0,0.10)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="28" y1="32" x2="50" y2="32" stroke="rgba(0,0,0,0.10)" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="28" y1="39" x2="46" y2="39" stroke="rgba(0,0,0,0.10)" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="40" cy="60" r="3.5" fill="rgba(180,83,9,0.15)"/>
+      <path d="M63 30 Q82 26 90 30" fill="none" stroke="rgba(201,146,42,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+      <path d="M87 26 L91 30 L87 34" fill="none" stroke="rgba(201,146,42,0.35)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="104" y="30" text-anchor="middle" font-family="Outfit,sans-serif" font-size="18" fill="rgba(201,146,42,0.85)">\u2605\u2605\u2605\u2605\u2605</text>
+      <text x="104" y="44" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="600" fill="rgba(201,146,42,0.6)">Google Review</text>
+      <rect x="78" y="52" width="44" height="16" rx="4" fill="rgba(3,105,161,0.06)" stroke="rgba(3,105,161,0.25)" stroke-width="1.2"/>
+      <text x="100" y="62" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" font-weight="600" fill="rgba(3,105,161,0.5)">Post-op education</text>
+    </svg>`,
+    problem: 'After-visit summary done by hand. Patient education is generic. No feedback ever collected.',
+    solution: 'AI generates a patient summary from the scribe transcript. Sends diagnosis-specific education and a Google review request.',
+    stat: '30 sec', statDesc: 'vs. 5\u201310 min manual \u2014 online reviews drive new referrals'
+  },
+  {
+    num: '12', name: 'Charge\nCapture', who: 'Back Office', whoColor: '#c2410c', time: '3\u20135 min',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <line x1="16" y1="8" x2="16" y2="62" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="16" y1="62" x2="130" y2="62" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-linecap="round"/>
+      <rect x="28" y="30" width="34" height="32" rx="3" fill="rgba(192,57,43,0.15)" stroke="rgba(192,57,43,0.4)" stroke-width="1.2"/>
+      <text x="45" y="24" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="rgba(192,57,43,0.55)">95%</text>
+      <text x="45" y="58" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" fill="rgba(0,0,0,0.3)">Manual</text>
+      <rect x="80" y="12" width="34" height="50" rx="3" fill="rgba(22,163,74,0.12)" stroke="rgba(22,163,74,0.4)" stroke-width="1.2"/>
+      <text x="97" y="6" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="rgba(22,163,74,0.6)">&gt;99%</text>
+      <text x="97" y="58" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7.5" fill="rgba(0,0,0,0.3)">AI</text>
+      <path d="M64 30 L64 12" stroke="rgba(201,146,42,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+      <text x="64" y="8" text-anchor="middle" font-family="Outfit,sans-serif" font-size="9" font-weight="600" fill="rgba(201,146,42,0.7)">+5%</text>
+    </svg>`,
+    problem: 'Manual charge entry misses 3\u20135% of billable services every single day.',
+    solution: 'AI captures charges from the signed note and audits before claim submission.',
+    stat: '$33K\u2013$56K', statDesc: 'in recovered revenue annually'
+  },
+  {
+    num: '13', name: 'Post-Visit\nPhone & Portal', who: 'Physician / APP / MA', whoColor: '#7c3aed', time: 'Ongoing daily',
+    icon: `<svg viewBox="0 0 140 70" width="140" height="70">
+      <rect x="40" y="2" width="60" height="66" rx="8" fill="white" stroke="rgba(124,58,237,0.3)" stroke-width="1.5"/>
+      <rect x="44" y="8" width="52" height="54" rx="5" fill="rgba(124,58,237,0.03)"/>
+      <rect x="48" y="12" width="44" height="10" rx="3" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.2)" stroke-width="0.8"/>
+      <text x="70" y="20" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">MRI result ready</text>
+      <rect x="48" y="26" width="44" height="10" rx="3" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.2)" stroke-width="0.8"/>
+      <text x="70" y="34" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">Rx refill request</text>
+      <rect x="48" y="40" width="44" height="10" rx="3" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.2)" stroke-width="0.8"/>
+      <text x="70" y="48" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">Post-op question</text>
+      <rect x="48" y="54" width="44" height="10" rx="3" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.2)" stroke-width="0.8"/>
+      <text x="70" y="62" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(192,57,43,0.5)">Auth status?</text>
+      <circle cx="94" cy="8" r="10" fill="rgba(192,57,43,0.85)"/>
+      <text x="94" y="12" text-anchor="middle" font-family="Outfit,sans-serif" font-size="11" font-weight="700" fill="white">40</text>
+      <rect x="4" y="30" width="28" height="16" rx="3" fill="rgba(22,163,74,0.08)" stroke="rgba(22,163,74,0.3)" stroke-width="1"/>
+      <text x="18" y="38" text-anchor="middle" font-family="Outfit,sans-serif" font-size="8" font-weight="700" fill="rgba(22,163,74,0.6)">AI</text>
+      <text x="18" y="44" text-anchor="middle" font-family="Outfit,sans-serif" font-size="7" fill="rgba(22,163,74,0.5)">sort</text>
+      <path d="M32 38 L40 38" stroke="rgba(22,163,74,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2"/>
+      <path d="M37 34 L41 38 L37 42" fill="none" stroke="rgba(22,163,74,0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`,
+    problem: '40 patient calls and messages daily. Physician pulls up charts to answer routine questions.',
+    solution: 'AI triages, drafts responses, and routes to the right person.',
+    stat: '$80\u2013$240', statDesc: 'in missed telephone E/M revenue recovered daily'
+  },
+];
+
+let current = 0;
+let autoTimer = null;
+let autoStart = null;
+const AUTO_DELAY = 6000;
+
+function buildDots() {
+  const wrap = document.getElementById('progressDots');
+  wrap.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'pdot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    wrap.appendChild(d);
+  });
+}
+
+function getState(i) {
+  const diff = i - current;
+  if (diff === 0) return 'active';
+  if (diff === 1) return 'next';
+  if (diff === 2) return 'next2';
+  if (diff < 0) return 'gone-left';
+  return 'hidden';
+}
+
+function buildCards() {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.state = getState(i);
+    card.dataset.index = i;
+    card.innerHTML = `
+      <div class="card-left" data-num="${s.num}">
+        <div class="card-step-num">STEP ${s.num}</div>
+        <div class="card-step-name">${s.name.replace('\n','<br>')}</div>
+        <div class="card-who">
+          <span class="who-dot" style="background:${s.whoColor}"></span>
+          ${s.who}
+        </div>
+        <div class="card-time">${s.time}</div>
+        <div class="card-icon">${s.icon}</div>
+      </div>
+      <div class="card-right">
+        <div class="card-block prob-block">
+          <div class="block-icon">
+            <svg viewBox="0 0 28 28" width="28" height="28">
+              <circle cx="14" cy="14" r="12" fill="rgba(192,57,43,0.1)" stroke="rgba(192,57,43,0.4)" stroke-width="1.5"/>
+              <line x1="14" y1="8" x2="14" y2="17" stroke="rgba(192,57,43,0.8)" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="14" cy="21" r="1.4" fill="rgba(192,57,43,0.8)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="block-label">Problem</div>
+            <div class="block-text">${s.problem}</div>
+          </div>
+        </div>
+        <div class="card-block sol-block">
+          <div class="block-icon">
+            <svg viewBox="0 0 28 28" width="28" height="28">
+              <circle cx="14" cy="14" r="12" fill="rgba(22,163,74,0.1)" stroke="rgba(22,163,74,0.4)" stroke-width="1.5"/>
+              <path d="M9 14l4 4 7-7" stroke="rgba(22,163,74,0.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div>
+            <div class="block-label">AI Solution</div>
+            <div class="block-text">${s.solution}</div>
+          </div>
+        </div>
+        <div class="card-stat">
+          <div class="stat-num">${s.stat}</div>
+          <div class="stat-desc">${s.statDesc}</div>
+        </div>
+      </div>
+    `;
+    stage.appendChild(card);
+  });
+  updateNav();
+}
+
+function goTo(n, dir) {
+  if (n === current) return;
+  const fromLeft = n > current;
+  current = Math.max(0, Math.min(n, STEPS.length - 1));
+  document.querySelectorAll('.card').forEach((c, i) => {
+    c.dataset.state = getState(i);
+  });
+  document.querySelectorAll('.pdot').forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+    d.classList.toggle('seen', i < current);
+  });
+  updateNav();
+  resetAutoplay();
+}
+
+function go(dir) {
+  const next = current + dir;
+  if (next < 0 || next >= STEPS.length) return;
+  goTo(next, dir);
+}
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === STEPS.length - 1;
+  document.getElementById('counter').textContent = `${current + 1} / ${STEPS.length}`;
+}
+
+// Autoplay
+function startAutoplay() {
+  clearTimeout(autoTimer);
+  const fill = document.getElementById('autoFill');
+  fill.style.transition = `width ${AUTO_DELAY}ms linear`;
+  fill.style.width = '100%';
+  autoTimer = setTimeout(() => {
+    if (current < STEPS.length - 1) {
+      go(1);
+    } else {
+      fill.style.transition = 'none';
+      fill.style.width = '0%';
+    }
+  }, AUTO_DELAY);
+}
+
+function resetAutoplay() {
+  clearTimeout(autoTimer);
+  const fill = document.getElementById('autoFill');
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => startAutoplay()));
+}
+
+// Pause autoplay on hover
+document.getElementById('stage').addEventListener('mouseenter', () => {
+  clearTimeout(autoTimer);
+  document.getElementById('autoFill').style.animationPlayState = 'paused';
+});
+document.getElementById('stage').addEventListener('mouseleave', () => {
+  resetAutoplay();
+});
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'ArrowLeft')  go(-1);
+});
+
+// Init
+buildDots();
+buildCards();
+startAutoplay();
+</script>
+</body>
+</html>

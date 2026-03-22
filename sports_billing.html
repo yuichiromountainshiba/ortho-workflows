@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ortho Sports Billing Tool — Mira Health</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+  :root{
+    --bg:#0f1117;--surface:#181c27;--surface2:#1e2330;--border:#2a3045;
+    --accent:#4fffb0;--accent2:#7eb8ff;--warn:#ffb74d;--danger:#ff6b6b;
+    --text:#e8eaf0;--muted:#7a8299;--code:#c9d1e8;
+    --radius:10px;--cf:33.40;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;
+    min-height:100vh;padding:24px 16px 60px;}
+  #wrap{max-width:700px;margin:0 auto;}
+
+  /* header */
+  .hdr{text-align:center;padding:32px 0 28px;}
+  .hdr h1{font-family:'DM Serif Display',serif;font-size:clamp(22px,4vw,32px);
+    letter-spacing:-0.5px;color:#fff;line-height:1.15;}
+  .hdr .by{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:1.5px;
+    text-transform:uppercase;margin:6px 0 4px;}
+  .hdr .sub{font-size:13px;color:var(--muted);line-height:1.6;}
+
+  /* category grid */
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:8px;}
+  .cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 16px;cursor:pointer;transition:all .18s ease;position:relative;overflow:hidden;}
+  .cat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent)08,transparent);
+    opacity:0;transition:opacity .18s;}
+  .cat-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .cat-card:hover::before{opacity:1;}
+  .cat-icon{font-size:26px;margin-bottom:8px;}
+  .cat-label{font-family:'DM Serif Display',serif;font-size:17px;color:#fff;display:block;margin-bottom:3px;}
+  .cat-sub{font-size:11px;color:var(--muted);line-height:1.4;}
+
+  /* progress */
+  .prog{display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:12px;color:var(--muted);}
+  .prog .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .prog .cat-name{color:var(--accent);font-weight:600;letter-spacing:.5px;}
+
+  /* back button */
+  .back{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 14px;
+    border-radius:6px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;
+    transition:all .15s;display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+  .back:hover{border-color:var(--accent2);color:var(--accent2);}
+
+  /* question */
+  .qlabel{font-family:'DM Serif Display',serif;font-size:19px;color:#fff;
+    margin-bottom:10px;line-height:1.35;}
+  .qhint{font-size:12px;color:var(--muted);background:var(--surface);border-left:3px solid var(--accent2);
+    padding:10px 12px;border-radius:0 6px 6px 0;margin-bottom:14px;line-height:1.6;}
+  .grid{display:flex;flex-direction:column;gap:8px;}
+  .btn{background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:13px 16px;border-radius:var(--radius);font-size:14px;cursor:pointer;
+    text-align:left;transition:all .15s;font-family:'DM Sans',sans-serif;line-height:1.4;}
+  .btn:hover{border-color:var(--accent);color:#fff;background:var(--surface2);}
+
+  /* graft screen */
+  .graft-grid{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+  .gtog{background:var(--surface);border:1px solid var(--border);color:var(--muted);
+    padding:11px 14px;border-radius:8px;font-size:13px;cursor:pointer;text-align:left;
+    transition:all .15s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:10px;}
+  .gtog .chk{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+  .gtog.sel{border-color:var(--accent);color:var(--text);background:var(--surface2);}
+  .gtog.sel .chk{background:var(--accent);border-color:var(--accent);color:#000;}
+  .confirm-btn{background:var(--accent);color:#000;border:none;padding:12px 24px;
+    border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;
+    font-family:'DM Sans',sans-serif;transition:opacity .15s;width:100%;}
+  .confirm-btn:hover{opacity:.88;}
+
+  /* done / results */
+  .done-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;}
+  .done-hdr{background:var(--surface2);padding:16px 20px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;}
+  .done-hdr h3{font-family:'DM Serif Display',serif;font-size:18px;color:#fff;}
+  .wrvu-badge{background:var(--accent);color:#000;font-size:13px;font-weight:700;
+    padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;}
+  .code-list{padding:16px 20px;}
+  .code-row{display:flex;justify-content:space-between;align-items:flex-start;
+    padding:10px 0;border-bottom:1px solid var(--border);}
+  .code-row:last-child{border-bottom:none;}
+  .code-info{flex:1;}
+  .code-num{font-family:'DM Mono',monospace;font-size:14px;color:var(--accent2);font-weight:500;}
+  .code-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .code-pay{text-align:right;flex-shrink:0;margin-left:12px;}
+  .code-wrvu{font-family:'DM Mono',monospace;font-size:13px;color:var(--text);}
+  .code-dollar{font-size:11px;color:var(--muted);margin-top:1px;}
+  .ao-tag{font-size:10px;background:#2a3045;color:var(--muted);padding:2px 6px;
+    border-radius:4px;margin-left:6px;vertical-align:middle;}
+
+  /* warnings */
+  .warns{padding:14px 20px;border-top:1px solid var(--border);}
+  .warn-item{background:#261f0e;border:1px solid #4a3a1a;border-radius:7px;
+    padding:10px 12px;font-size:12px;color:#e8c97a;margin-bottom:8px;line-height:1.6;}
+  .warn-item:last-child{margin-bottom:0;}
+
+  /* op notes */
+  .op-notes{padding:14px 20px;border-top:1px solid var(--border);}
+  .op-notes h4{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.8px;
+    text-transform:uppercase;margin-bottom:10px;}
+  .note-item{margin-bottom:10px;}
+  .note-code{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2);margin-bottom:3px;}
+  .note-text{font-size:12px;color:var(--muted);line-height:1.6;}
+
+  /* total row */
+  .total-row{background:var(--surface2);padding:14px 20px;
+    border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .total-label{font-size:13px;color:var(--muted);}
+  .total-val{font-family:'DM Mono',monospace;font-size:20px;color:var(--accent);font-weight:500;}
+  .total-dollar{font-size:13px;color:var(--muted);text-align:right;margin-top:2px;}
+
+  /* restart */
+  .restart-btn{background:none;border:1px solid var(--border);color:var(--muted);
+    padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:14px;
+    font-family:'DM Sans',sans-serif;width:100%;transition:all .15s;}
+  .restart-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+  /* warn flag on code row */
+  .warn-flag{display:inline-block;width:7px;height:7px;background:var(--warn);
+    border-radius:50%;margin-left:6px;vertical-align:middle;}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="hdr">
+    <h1>Orthopedic Sports Surgery<br>Billing Tool</h1>
+    <div class="by">by Mira Health</div>
+    <div class="sub">CPT coding and Medicare 2026 wRVU rates · non-QPP conversion factor $33.40</div>
+  </div>
+  <div id="app"></div>
+</div>
+<script>
+var CF=33.40;
+var S;
+function newState(){return{step:'cat',cat:'',codes:[],warns:[],hist:[],gsel:[],graftNext:''};}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function save(){S.hist.push(clone(S));}
+function back(){if(!S.hist.length)return;S=S.hist.pop();draw();}
+function addC(id){S.codes.push(''+id);}
+function addN(id,n){for(var i=0;i<n;i++)S.codes.push(''+id);}
+function remC(id){var i=S.codes.indexOf(''+id);if(i>=0)S.codes.splice(i,1);}
+function warn(m){if(S.warns.indexOf(m)<0)S.warns.push(m);}
+function go(id){save();S.step=id;draw();}
+function doC(code,next){save();if(code){var a=Array.isArray(code)?code:[code];a.forEach(function(c){addC(c);});}S.step=next;draw();}
+function doN(id,n,next){save();addN(id,n);S.step=next;draw();}
+function goGraft(next){save();S.graftNext=next;S.step='graft';S.gsel=[];draw();}
+function toggleG(id){var i=S.gsel.indexOf(id);if(i>=0)S.gsel.splice(i,1);else S.gsel.push(id);
+  document.querySelectorAll('.gtog').forEach(function(el){
+    if(el.dataset.gid===id){el.classList.toggle('sel',S.gsel.indexOf(id)>=0);
+      var chk=el.querySelector('.chk');if(chk)chk.textContent=S.gsel.indexOf(id)>=0?'✓':'';}});}
+function confirmG(){save();S.gsel.forEach(function(sid){var o=GRAFTS.filter(function(x){return x.id===sid;})[0];if(o)o.codes.forEach(function(c){addC(c);});});S.gsel=[];S.step=S.graftNext;draw();}
+function totalW(){return S.codes.reduce(function(a,id){return a+((DB[id]||{}).w||0);},0);}
+
+var DB={
+  '29870':{d:'Knee arthroscopy diagnostic',w:5.06},
+  '29871':{d:'Knee arthroscopy infection irrigation',w:6.52},
+  '29873':{d:'Knee arthroscopy lateral release',w:6.08},
+  '29874':{d:'Knee arthroscopy loose body/FB removal',w:7.01},
+  '29875':{d:'Knee arthroscopy synovectomy limited',w:6.29},
+  '29876':{d:'Knee arthroscopy synovectomy major',w:8.65},
+  '29877':{d:'Knee arthroscopy debridement/shaving',w:8.09},
+  '29879':{d:'Knee arthroscopy abrasion arthroplasty',w:8.77},
+  '29880':{d:'Knee arthroscopy medial AND lateral meniscectomy',w:7.21},
+  '29881':{d:'Knee arthroscopy medial OR lateral meniscectomy',w:6.85},
+  '29882':{d:'Knee arthroscopy meniscus repair medial or lateral',w:9.36},
+  '29883':{d:'Knee arthroscopy meniscus repair medial AND lateral',w:11.48},
+  '29884':{d:'Knee arthroscopy lysis of adhesions',w:8.07},
+  '29885':{d:'Knee arthroscopy drilling OCD lesion with bone grafting',w:9.95},
+  '29886':{d:'Knee arthroscopy drilling OCD lesion',w:8.28},
+  '29887':{d:'Knee arthroscopy drilling OCD with fixation',w:9.91},
+  '29888':{d:'Arthroscopy-assisted ACL repair/augmentation',w:13.94},
+  '29889':{d:'Arthroscopy-assisted PCL repair/augmentation',w:16.97},
+  '27403':{d:'Arthrotomy with meniscal repair open',w:8.4},
+  '27405':{d:'Open repair primary knee ligament',w:8.85},
+  '27407':{d:'Open repair cruciate ligament',w:10.58},
+  '27409':{d:'Open repair multiple knee ligaments',w:13.37},
+  '27427':{d:'Knee ligament reconstruction extra-articular',w:9.55},
+  '27428':{d:'Knee ligament reconstruction intra-articular',w:15.19},
+  '27429':{d:'Knee ligament reconstruction combined',w:17.1},
+  '27415':{d:'Osteochondral knee allograft',w:19.5},
+  '27418':{d:'Patellofemoral anteromedialization (Fulkerson/AMZ)',w:11.31},
+  '27420':{d:'Revision unstable kneecap (lateral release/realignment)',w:10.0},
+  '27422':{d:'Revision unstable kneecap with extensor realignment (MPFL)',w:9.95},
+  '27424':{d:'Revision/removal of kneecap',w:9.98},
+  '27446':{d:'Medial or lateral unicompartmental arthroplasty (UKA)',w:16.7},
+  '27447':{d:'Total knee arthroplasty (TKA)',w:19.11},
+  '27486':{d:'Revision TKA — one component',w:20.59},
+  '27487':{d:'Revision TKA — femoral and tibial components',w:26.43},
+  '27530':{d:'Closed treatment distal femur fracture',w:2.58},
+  '27532':{d:'Closed treatment tibial plateau fracture',w:7.36},
+  '27535':{d:'Open treatment tibial plateau fracture 1 fragment',w:13.07},
+  '27536':{d:'Open treatment tibial plateau fracture 2+ fragments',w:16.96},
+  '27538':{d:'Closed treatment tibial shaft fracture',w:4.96},
+  '27540':{d:'Open treatment patella fracture',w:11.02},
+  '27560':{d:'Closed treatment patellar dislocation w/o anesthesia',w:3.89},
+  '27562':{d:'Closed treatment patellar dislocation with anesthesia',w:5.83},
+  '27566':{d:'Open treatment patellar dislocation',w:12.39},
+  '29805':{d:'Shoulder arthroscopy diagnostic',w:5.88},
+  '29806':{d:'Shoulder arthroscopy capsulorrhaphy',w:14.76},
+  '29807':{d:'Shoulder arthroscopy SLAP repair',w:14.3},
+  '29819':{d:'Shoulder arthroscopy loose body/FB removal',w:7.6},
+  '29820':{d:'Shoulder arthroscopy synovectomy partial',w:7.03},
+  '29821':{d:'Shoulder arthroscopy synovectomy complete',w:7.69},
+  '29822':{d:'Shoulder arthroscopy debridement limited',w:6.85},
+  '29823':{d:'Shoulder arthroscopy debridement extensive',w:7.78},
+  '29824':{d:'Shoulder arthroscopy distal clavicle excision (Mumford)',w:8.76},
+  '29825':{d:'Shoulder arthroscopy release/resection adhesions',w:7.6},
+  '29826':{d:'Shoulder arthroscopy subacromial decompression (add-on)',w:2.93,ao:1},
+  '29827':{d:'Shoulder arthroscopy rotator cuff repair',w:15.2},
+  '29828':{d:'Shoulder arthroscopy biceps tenodesis',w:12.83},
+  '23410':{d:'Open rotator cuff repair — acute',w:11.11},
+  '23412':{d:'Open rotator cuff repair — chronic',w:11.63},
+  '23420':{d:'Repair complete shoulder rotator cuff/dislocation',w:13.2},
+  '23430':{d:'Biceps tenodesis open',w:9.92},
+  '23440':{d:'Remove/transplant biceps tendon',w:10.37},
+  '23450':{d:'Capsulorrhaphy — plication anterior',w:13.36},
+  '23455':{d:'Bankart repair with labral reattachment',w:14.3},
+  '23460':{d:'Latarjet coracoid transfer / capsulorrhaphy anterior-inferior',w:15.42},
+  '23462':{d:'Capsulorrhaphy posterior-inferior',w:15.33},
+  '23465':{d:'Glenoplasty posterior bone block',w:15.89},
+  '23466':{d:'Capsulorrhaphy multidirectional',w:15.41},
+  '23470':{d:'Hemiarthroplasty shoulder',w:17.44},
+  '23472':{d:'Total shoulder arthroplasty (TSA / RSA)',w:21.58},
+  '23473':{d:'Revision TSA — humeral component only',w:24.38},
+  '23474':{d:'Revision TSA — total components',w:26.53},
+  '23515':{d:'Open treatment clavicle fracture with internal fixation',w:9.45},
+  '23550':{d:'Open treatment AC joint dislocation',w:7.4},
+  '23552':{d:'Open treatment AC joint dislocation with graft',w:8.6},
+  '23615':{d:'Open treatment proximal humerus fracture with internal fixation',w:11.99},
+  '23616':{d:'Open treatment proximal humerus fracture with arthroplasty',w:17.91},
+  '29860':{d:'Hip arthroscopy diagnostic',w:8.78},
+  '29861':{d:'Hip arthroscopy with FB removal',w:9.85},
+  '29862':{d:'Hip arthroscopy with debridement',w:10.89},
+  '29863':{d:'Hip arthroscopy with synovectomy',w:10.89},
+  '29914':{d:'Hip arthroscopy with femoroplasty (cam decompression)',w:14.3},
+  '29915':{d:'Hip arthroscopy with acetabuloplasty (pincer decompression)',w:14.63},
+  '29916':{d:'Hip arthroscopy with labral repair',w:14.63},
+  '27125':{d:'Hip hemiarthroplasty',w:16.22},
+  '27130':{d:'Total hip arthroplasty (THA) primary',w:19.11},
+  '27132':{d:'THA — conversion from prior surgery',w:25.05},
+  '27134':{d:'Revision THA — both components',w:29.52},
+  '27137':{d:'Revision THA — acetabular component only',w:22.13},
+  '27138':{d:'Revision THA — femoral component only',w:23.11},
+  '27235':{d:'Closed reduction internal fixation proximal femur (CRIF)',w:12.68},
+  '27236':{d:'Open reduction internal fixation femoral neck (ORIF)',w:17.17},
+  '27244':{d:'ORIF intertrochanteric fracture',w:17.73},
+  '27245':{d:'ORIF peritrochanteric fracture — cephalomedullary nail',w:17.73},
+  '29894':{d:'Ankle arthroscopy with loose body removal',w:7.17},
+  '29895':{d:'Ankle arthroscopy with synovectomy',w:6.95},
+  '29897':{d:'Ankle arthroscopy with debridement limited',w:7.14},
+  '29898':{d:'Ankle arthroscopy with debridement extensive',w:8.28},
+  '27650':{d:'Repair Achilles tendon — primary',w:8.98},
+  '27652':{d:'Repair Achilles tendon with graft',w:10.51},
+  '27654':{d:'Repair Achilles tendon — secondary/neglected',w:10.27},
+  '27695':{d:'Repair ankle ligament — primary (Brostrom)',w:6.53},
+  '27696':{d:'Repair ankle ligaments — both sides (modified Brostrom)',w:8.37},
+  '27698':{d:'Repair secondary/neglected ankle ligament',w:9.37},
+  '27766':{d:'Open treatment medial malleolus fracture',w:7.69},
+  '27769':{d:'Open treatment posterior malleolus fracture',w:9.89},
+  '27792':{d:'Open treatment distal fibula fracture',w:8.53},
+  '27814':{d:'Open treatment bimalleolar ankle fracture',w:10.35},
+  '27822':{d:'Open treatment trimalleolar ankle fracture',w:10.93},
+  '29830':{d:'Elbow arthroscopy diagnostic',w:5.73},
+  '29834':{d:'Elbow arthroscopy with loose body removal',w:6.26},
+  '29835':{d:'Elbow arthroscopy synovectomy partial',w:6.45},
+  '29836':{d:'Elbow arthroscopy synovectomy complete',w:7.53},
+  '29837':{d:'Elbow arthroscopy debridement limited',w:6.83},
+  '29838':{d:'Elbow arthroscopy debridement extensive',w:7.68},
+  '24342':{d:'Repair ruptured distal biceps tendon',w:10.59},
+  '24343':{d:'Repair lateral elbow ligament (LCL)',w:8.93},
+  '24344':{d:'Reconstruct lateral elbow ligament',w:14.83},
+  '24345':{d:'Repair medial elbow ligament (UCL)',w:8.93},
+  '24346':{d:'Reconstruct medial elbow ligament — Tommy John (UCL)',w:14.83},
+  '24357':{d:'Lateral epicondylitis repair percutaneous',w:5.3},
+  '24358':{d:'Lateral epicondylitis repair with debridement open',w:6.49},
+  '24359':{d:'Lateral epicondylitis repair with reattachment open',w:8.76},
+  '20900':{d:'Bone graft removal small',w:2.93},
+  '20902':{d:'Bone graft removal major',w:4.47},
+  '20924':{d:'Tendon graft from distant site',w:6.51},
+  '20920':{d:'Fascia lata graft small',w:5.37},
+  '20922':{d:'Fascia lata graft large',w:6.76},
+  '20931':{d:'Structural allograft (add-on)',w:1.76,ao:1},
+  '20936':{d:'Local autograft same incision (add-on) — $0 Medicare / may pay commercial',w:0.0,ao:1},
+  '20937':{d:'Morselized autograft separate incision (add-on)',w:2.72,ao:1},
+  '20938':{d:'Structural autograft separate incision (add-on)',w:2.94,ao:1},
+  '20985':{d:'Computer-assisted ortho surgical navigation (add-on)',w:2.44,ao:1},
+  '27438':{d:'Patellar arthroplasty/resurfacing with implant',w:11.59},
+  '27488':{d:'Removal of knee prosthesis hardware',w:17.16},
+  '27702':{d:'Total ankle arthroplasty — implant-preserving reconstruct',w:14.06},
+  '27703':{d:'Total ankle arthroplasty — total replacement',w:16.52},
+  '27704':{d:'Removal of ankle implant',w:7.61},
+};
+
+var CAT_NAMES={knee:'Knee',sho:'Shoulder',hip:'Hip',ank:'Ankle/Foot',elb:'Elbow'};
+
+var CATS=[
+  {id:'knee',label:'Knee',icon:'🦵',sub:'Arthroscopy, ACL/meniscus, arthroplasty, fracture'},
+  {id:'sho',label:'Shoulder',icon:'💪',sub:'Arthroscopy, rotator cuff, instability, arthroplasty'},
+  {id:'hip',label:'Hip',icon:'🦴',sub:'Arthroscopy, arthroplasty, fracture'},
+  {id:'ank',label:'Ankle / Foot',icon:'🦶',sub:'Arthroscopy, Achilles, ligament, fracture'},
+  {id:'elb',label:'Elbow',icon:'🤚',sub:'Arthroscopy, UCL/LCL, epicondylitis, distal biceps'},
+];
+
+var MULT2=new Set(["27530", "29898", "27538", "27650", "23450", "27245", "23552", "27130", "23440", "27540", "29805", "27427", "23550", "27244", "23466", "27415", "29889", "27138", "27704", "24346", "27696", "27446", "23462", "27532", "27125", "27424", "23473", "23410", "23472", "27766", "24345", "27769", "27562", "27792", "24344", "27566", "24359", "27407", "27438", "27447", "24358", "23515", "27420", "23430", "23470", "27134", "27486", "27536", "24357", "27695", "29888", "27405", "27560", "24342", "27822", "27235", "27703", "23420", "23465", "27137", "27698", "23460", "29897", "29894", "29830", "23412", "23616", "27814", "27428", "23455", "29860", "27654", "23474", "27702", "27535", "27409", "27132", "20924", "27236", "23615", "27652", "27429", "29895", "27403", "27487", "29870", "27418", "27422", "24343"]);
+var MULT3=new Set(["29835", "29883", "29828", "29875", "29827", "29886", "29884", "29819", "29861", "29873", "29882", "29862", "29881", "29887", "29837", "29885", "29838", "29806", "29820", "29916", "29880", "29807", "29824", "29822", "29876", "29834", "29825", "29879", "29823", "29871", "29863", "29821", "29836", "29874", "29877", "29915", "29914"]);
+var GRAFTS=[
+  {id:'g_20931',label:'Structural allograft (+20931)',codes:['20931']},
+  {id:'g_20936',label:'Local autograft same incision (+20936, $0 Medicare)',codes:['20936']},
+  {id:'g_20937',label:'Morselized autograft separate incision (+20937)',codes:['20937']},
+  {id:'g_20938',label:'Structural autograft ICBG separate incision (+20938)',codes:['20938']},
+  {id:'g_20924',label:'Tendon graft from distant site (+20924)',codes:['20924']},
+  {id:'g_none', label:'No graft / graft included in primary code',codes:[]},
+];
+
+var STEPS={};
+function step(id,fn){STEPS[id]=fn;}
+function q(label,opts,hint){
+  var h=hint?'<p class="qhint">'+hint+'</p>':'';
+  var btns=opts.map(function(o,i){return'<button class="btn" data-qi="'+i+'">'+o.label+'</button>';}).join('');
+  setTimeout(function(){
+    var w=document.getElementById('qwrap');if(!w)return;
+    w.querySelectorAll('[data-qi]').forEach(function(b){
+      b.addEventListener('click',function(){opts[parseInt(b.dataset.qi)].fn();});});},0);
+  return'<p class="qlabel">'+label+'</p>'+h+'<div class="grid" id="qwrap">'+btns+'</div>';
+}
+
+// ── KNEE ────────────────────────────────────────────────────────────────────
+step('knee1',function(){return q('What is the primary knee procedure?',[
+  {label:'Knee arthroscopy',fn:function(){go('kn_scope');}},
+  {label:'Open ligament reconstruction / repair',fn:function(){go('kn_lig');}},
+  {label:'Patellofemoral procedure',fn:function(){go('kn_pat');}},
+  {label:'Knee arthroplasty (UKA or TKA)',fn:function(){go('kn_arth');}},
+  {label:'Fracture treatment',fn:function(){go('kn_fx');}},
+]);});
+
+// KNEE ARTHROSCOPY
+step('kn_scope',function(){return q('Primary arthroscopic procedure?',[
+  {label:'Diagnostic only (29870)',fn:function(){doC('29870','kn_scope_addon');}},
+  {label:'Meniscectomy medial OR lateral (29881)',fn:function(){doC('29881','kn_scope_addon');}},
+  {label:'Meniscectomy medial AND lateral (29880)',fn:function(){doC('29880','kn_scope_addon');}},
+  {label:'Meniscus repair medial or lateral (29882)',fn:function(){doC('29882','kn_scope_addon');}},
+  {label:'Meniscus repair medial AND lateral (29883)',fn:function(){doC('29883','kn_scope_addon');}},
+  {label:'ACL arthroscopic-assisted repair/augmentation (29888)',fn:function(){doC('29888','kn_scope_addon');}},
+  {label:'PCL arthroscopic-assisted repair/augmentation (29889)',fn:function(){doC('29889','kn_scope_addon');}},
+  {label:'Debridement/shaving chondral surface (29877)',fn:function(){doC('29877','kn_scope_addon');}},
+  {label:'Abrasion arthroplasty (29879)',fn:function(){doC('29879','kn_scope_addon');}},
+  {label:'OCD drilling (29885/29886/29887)',fn:function(){go('kn_ocd');}},
+  {label:'Lateral release (29873)',fn:function(){doC('29873','kn_scope_addon');}},
+  {label:'Loose body / FB removal (29874)',fn:function(){doC('29874','kn_scope_addon');}},
+  {label:'Synovectomy limited (29875)',fn:function(){doC('29875','kn_scope_addon');}},
+  {label:'Synovectomy major (29876)',fn:function(){doC('29876','kn_scope_addon');}},
+  {label:'Lysis of adhesions (29884)',fn:function(){doC('29884','kn_scope_addon');}},
+  {label:'Infection irrigation (29871)',fn:function(){doC('29871','kn_scope_addon');}},
+],'Use the highest-complexity procedure as the primary code. Additional arthroscopic procedures at the same time are reported separately only when they are distinct from the primary procedure — for example, meniscectomy + lateral release is 29881 + 29873. Do not report debridement (29877) if it is incidental to the primary procedure. Arthroscopy vs open distinction is a high audit risk area.');});
+
+step('kn_ocd',function(){return q('OCD procedure type?',[
+  {label:'Drilling alone without grafting (29886)',fn:function(){doC('29886','kn_scope_addon');}},
+  {label:'Drilling with bone grafting (29885)',fn:function(){doC('29885','kn_scope_addon');}},
+  {label:'Drilling with internal fixation (29887)',fn:function(){doC('29887','kn_scope_addon');}},
+  {label:'Osteochondral allograft open (27415)',fn:function(){save();addC('27415');goGraft('kn_bilat_q');}},
+]);});
+
+step('kn_scope_addon',function(){return q('Were additional distinct arthroscopic procedures performed?',[
+  {label:'No additional procedures',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'Also lateral release (+29873)',fn:function(){save();addC('29873');S.step='kn_scope_addon2';draw();}},
+  {label:'Also debridement (+29877)',fn:function(){save();warn('29877 should not be reported if the debridement is incidental to the primary procedure. Only report if a separate, distinct chondral surface treatment was performed.');addC('29877');goGraft('kn_bilat_q');}},
+  {label:'Also synovectomy limited (+29875)',fn:function(){save();addC('29875');goGraft('kn_bilat_q');}},
+  {label:'Also loose body removal (+29874)',fn:function(){save();addC('29874');goGraft('kn_bilat_q');}},
+],'Modifier 51 note: knee arthroscopy codes (29xxx) are standalone codes, not add-ons. When multiple arthroscopic procedures are performed, the highest-wRVU code is primary, additional procedures take Mod 51. Exception: add-on codes like +29826 are Mod 51 exempt.');});
+
+step('kn_scope_addon2',function(){return q('Any other additional procedures?',[
+  {label:'No more',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'Also synovectomy limited (+29875)',fn:function(){save();addC('29875');goGraft('kn_bilat_q');}},
+  {label:'Also debridement (+29877)',fn:function(){save();warn('29877 only if distinct chondral treatment separate from primary procedure.');addC('29877');goGraft('kn_bilat_q');}},
+]);});
+
+// KNEE LIGAMENT OPEN
+step('kn_lig',function(){return q('Open ligament/tendon procedure?',[
+  {label:'Primary repair — single ligament (27405)',fn:function(){doC('27405','kn_bilat_q');}},
+  {label:'Primary repair — cruciate (27407)',fn:function(){doC('27407','kn_bilat_q');}},
+  {label:'Primary repair — multiple ligaments (27409)',fn:function(){doC('27409','kn_bilat_q');}},
+  {label:'ACL reconstruction extra-articular (27427)',fn:function(){doC('27427','kn_lig_graft');}},
+  {label:'ACL reconstruction intra-articular (27428)',fn:function(){doC('27428','kn_lig_graft');}},
+  {label:'Combined ACL reconstruction (27429)',fn:function(){doC('27429','kn_lig_graft');}},
+  {label:'Open meniscal repair via arthrotomy (27403)',fn:function(){doC('27403','kn_bilat_q');}},
+],'Note: ACL reconstruction via arthroscopic-assisted technique = 29888, not 27428. 27427-27429 are for open techniques. Arthroscopic approach is the standard of care and should use 29888.');});
+
+step('kn_lig_graft',function(){return q('Was a graft used?',[
+  {label:'Yes — patellar tendon (BTB) autograft',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'Yes — hamstring autograft',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'Yes — allograft',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'No graft (primary repair only)',fn:function(){go('kn_bilat_q');}},
+],'Graft harvesting codes: BTB autograft from same incision = 20936 ($0 Medicare). Hamstring autograft = 20924 if from distant tendon site. Allograft = 20931 (structural). Do not bill 20936 for graft harvested through same wound as primary — it carries $0 Medicare pay but may be covered by commercial payers.');});
+
+// KNEE PATELLOFEMORAL
+step('kn_pat',function(){return q('Patellofemoral procedure?',[
+  {label:'Anteromedialization / Fulkerson / AMZ osteotomy (27418)',fn:function(){doC('27418','kn_bilat_q');}},
+  {label:'Lateral release / realignment (27420)',fn:function(){doC('27420','kn_bilat_q');}},
+  {label:'MPFL reconstruction (27422)',fn:function(){doC('27422','kn_pat_graft');}},
+  {label:'Revision / removal of kneecap (27424)',fn:function(){doC('27424','kn_bilat_q');}},
+  {label:'Osteochondral allograft knee (27415)',fn:function(){save();addC('27415');goGraft('kn_bilat_q');}},
+]);});
+
+step('kn_pat_graft',function(){return q('Was a graft used for reconstruction?',[
+  {label:'Yes — autograft or allograft',fn:function(){goGraft('kn_bilat_q');}},
+  {label:'No graft',fn:function(){go('kn_bilat_q');}},
+]);});
+
+// KNEE ARTHROPLASTY
+step('kn_arth',function(){return q('Knee arthroplasty type?',[
+  {label:'Medial or lateral unicompartmental arthroplasty — UKA (27446)',fn:function(){doC('27446','kn_arth_rev');}},
+  {label:'Total knee arthroplasty — TKA (27447)',fn:function(){doC('27447','kn_arth_pat');}},
+  {label:'Revision TKA — one component (27486)',fn:function(){save();warn('27486: one component revised. If both femoral AND tibial components revised, use 27487 instead.');addC('27486');S.step='ank_bilat_q';draw();}},
+  {label:'Revision TKA — femoral and tibial components (27487)',fn:function(){doC('27487','done');}},
+],'For TKA, 27447 includes all components — do not unbundle femoral, tibial, and patellar component placement into separate codes. Bilateral TKA same session: bill each side separately with Mod 50 or separate line items per payer policy. HCPCS device note: implant costs (C-codes such as C1776 for artificial joints) are reported on the FACILITY claim only, never on the surgeon professional claim. The surgeon bills CPT procedure codes only.');});
+
+step('kn_arth_rev',function(){return q('Was this a bilateral procedure?',[
+  {label:'No — unilateral',fn:function(){go('kn_arth_nav');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral arthroplasty same session: report primary code with Mod 50, or two separate line items with RT/LT modifiers, per payer-specific billing requirements. Some payers require LT/RT on separate lines. Medicare pays 150% of the unilateral rate for bilateral same-session procedures.');S.step='kn_arth_nav';draw();}},
+]);});
+
+// KNEE FRACTURE
+step('kn_fx',function(){return q('What fracture/dislocation?',[
+  {label:'Tibial plateau fracture — closed no manipulation (27532)',fn:function(){doC('27532','kn_bilat_q');}},
+  {label:'Tibial plateau fracture — open 1 fragment (27535)',fn:function(){doC('27535','kn_bilat_q');}},
+  {label:'Tibial plateau fracture — open 2+ fragments (27536)',fn:function(){doC('27536','kn_bilat_q');}},
+  {label:'Patella fracture — open treatment (27540)',fn:function(){doC('27540','kn_bilat_q');}},
+  {label:'Tibial shaft fracture — closed (27538)',fn:function(){doC('27538','kn_bilat_q');}},
+  {label:'Distal femur fracture — closed (27530)',fn:function(){doC('27530','kn_bilat_q');}},
+  {label:'Patellar dislocation — closed w/o anesthesia (27560)',fn:function(){doC('27560','kn_bilat_q');}},
+  {label:'Patellar dislocation — closed with anesthesia (27562)',fn:function(){doC('27562','kn_bilat_q');}},
+  {label:'Patellar dislocation — open treatment (27566)',fn:function(){doC('27566','kn_bilat_q');}},
+]);});
+
+// ── SHOULDER ────────────────────────────────────────────────────────────────
+step('sho1',function(){return q('What is the primary shoulder procedure?',[
+  {label:'Shoulder arthroscopy',fn:function(){go('sho_scope');}},
+  {label:'Rotator cuff repair open',fn:function(){go('sho_rct_open');}},
+  {label:'Shoulder instability / labral repair open',fn:function(){go('sho_instab');}},
+  {label:'Shoulder arthroplasty',fn:function(){go('sho_arth');}},
+  {label:'Fracture treatment',fn:function(){go('sho_fx');}},
+  {label:'Biceps tendon procedure',fn:function(){go('sho_bic');}},
+]);});
+
+// SHOULDER ARTHROSCOPY
+step('sho_scope',function(){return q('Primary arthroscopic shoulder procedure?',[
+  {label:'Rotator cuff repair (29827)',fn:function(){doC('29827','sho_scope_sub');}},
+  {label:'SLAP repair (29807)',fn:function(){doC('29807','sho_scope_sub');}},
+  {label:'Capsulorrhaphy / instability repair (29806)',fn:function(){doC('29806','sho_scope_sub');}},
+  {label:'Biceps tenodesis (29828)',fn:function(){doC('29828','sho_scope_sub');}},
+  {label:'Distal clavicle excision Mumford (29824)',fn:function(){doC('29824','sho_scope_sub');}},
+  {label:'Debridement limited (29822)',fn:function(){doC('29822','sho_scope_sub');}},
+  {label:'Debridement extensive (29823)',fn:function(){doC('29823','sho_scope_sub');}},
+  {label:'Release / resection of adhesions (29825)',fn:function(){doC('29825','sho_scope_sub');}},
+  {label:'Loose body / FB removal (29819)',fn:function(){doC('29819','sho_scope_sub');}},
+  {label:'Synovectomy partial (29820)',fn:function(){doC('29820','sho_scope_sub');}},
+  {label:'Synovectomy complete (29821)',fn:function(){doC('29821','sho_scope_sub');}},
+  {label:'Diagnostic only (29805)',fn:function(){doC('29805','sho_scope_sub');}},
+],'Use the highest-complexity procedure as primary. 29827 (rotator cuff repair) is the anchor code for combined arthroscopic procedures involving cuff repair — distal clavicle excision and biceps tenodesis are commonly added.');});
+
+step('sho_scope_sub',function(){return q('Was subacromial decompression also performed?',[
+  {label:'Yes — subacromial decompression (+29826)',fn:function(){save();warn('+29826 is an add-on code. Do NOT report 29826 alone — it must accompany a primary shoulder arthroscopy code. It is Mod 51 exempt as an add-on. CMS auditors frequently target 29826 reported without adequate documentation of distinct acromioplasty.');addC('29826');S.step='sho_scope_extra';draw();}},
+  {label:'No separate subacromial decompression',fn:function(){go('sho_scope_extra');}},
+]);});
+
+step('sho_scope_extra',function(){return q('Were additional distinct arthroscopic procedures performed?',[
+  {label:'No additional procedures',fn:function(){go('sho_bilat_q');}},
+  {label:'Also distal clavicle excision (+29824)',fn:function(){save();addC('29824');S.step='sho_bilat_q';draw();}},
+  {label:'Also biceps tenodesis (+29828)',fn:function(){save();addC('29828');S.step='sho_bilat_q';draw();}},
+  {label:'Also debridement (+29822 or +29823)',fn:function(){save();warn('Debridement should only be reported when a distinct, separate chondral or soft tissue debridement was performed beyond the primary procedure. Do not report as incidental work.');addC('29822');S.step='sho_bilat_q';draw();}},
+]);});
+
+// SHOULDER ROTATOR CUFF OPEN
+step('sho_rct_open',function(){return q('Rotator cuff procedure?',[
+  {label:'Acute tear repair (23410)',fn:function(){doC('23410','sho_bilat_q');}},
+  {label:'Chronic tear repair (23412)',fn:function(){doC('23412','sho_bilat_q');}},
+  {label:'Complete tear with shoulder stabilization (23420)',fn:function(){doC('23420','sho_bilat_q');}},
+],'Distinguish arthroscopic (29827) from open (23410/23412). If the procedure starts arthroscopically and converts to open, use the open code. Document tear size, retraction grade, and tissue quality to support the open approach decision.');});
+
+// SHOULDER INSTABILITY
+step('sho_instab',function(){return q('Shoulder instability / labral procedure (open)?',[
+  {label:'Bankart repair — capsular plication (23450)',fn:function(){doC('23450','sho_bilat_q');}},
+  {label:'Bankart repair with labral reattachment suture anchor (23455)',fn:function(){doC('23455','sho_bilat_q');}},
+  {label:'Latarjet / coracoid transfer (23460)',fn:function(){doC('23460','sho_bilat_q');}},
+  {label:'Posterior capsulorrhaphy (23462)',fn:function(){doC('23462','sho_bilat_q');}},
+  {label:'Posterior bone block glenoplasty (23465)',fn:function(){doC('23465','sho_instab_graft');}},
+  {label:'Multidirectional instability repair (23466)',fn:function(){doC('23466','sho_bilat_q');}},
+],'Arthroscopic capsulorrhaphy = 29806, not 23450. Use 23460 for Latarjet (coracoid transfer). 23465 is for posterior bone block procedures. Document direction of instability, number of dislocations, engaging Hill-Sachs lesion if present, and glenoid bone loss percentage.');});
+
+step('sho_instab_graft',function(){return q('Was a bone graft placed?',[
+  {label:'Yes — coracoid or iliac crest allograft',fn:function(){goGraft('sho_bilat_q');}},
+  {label:'No separate graft',fn:function(){go('sho_bilat_q');}},
+]);});
+
+// SHOULDER ARTHROPLASTY
+step('sho_arth',function(){return q('Shoulder arthroplasty type?',[
+  {label:'Hemiarthroplasty — humeral head replacement (23470)',fn:function(){doC('23470','sho_arth_bilat');}},
+  {label:'Total shoulder arthroplasty — anatomic TSA (23472)',fn:function(){doC('23472','sho_arth_bilat');}},
+  {label:'Reverse total shoulder arthroplasty — RSA (23472)',fn:function(){save();warn('Anatomic TSA and RSA are both billed as 23472. Document implant system, component sizes, and whether anatomic or reverse configuration was used.');addC('23472');S.step='sho_arth_bilat';draw();}},
+  {label:'Revision TSA — humeral component only (23473)',fn:function(){doC('23473','done');}},
+  {label:'Revision TSA — total both components (23474)',fn:function(){doC('23474','done');}},
+],'23472 covers both anatomic TSA and RSA — no separate code for RSA. For conversion of hemi to total: use 23472. For conversion of TSA to RSA: use 23473 or 23474 depending on what was revised.');});
+
+step('sho_arth_bilat',function(){return q('Bilateral procedure?',[
+  {label:'No — unilateral',fn:function(){go('done');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral shoulder arthroplasty same session: use Mod 50 or LT/RT per payer policy.');S.step='done';draw();}},
+]);});
+
+// SHOULDER FRACTURE
+step('sho_fx',function(){return q('What fracture/dislocation?',[
+  {label:'Clavicle fracture — open treatment with fixation (23515)',fn:function(){doC('23515','sho_bilat_q');}},
+  {label:'AC joint dislocation — open without graft (23550)',fn:function(){doC('23550','sho_bilat_q');}},
+  {label:'AC joint dislocation — open with graft (23552)',fn:function(){doC('23552','sho_bilat_q');}},
+  {label:'Proximal humerus fracture — open with internal fixation (23615)',fn:function(){doC('23615','sho_bilat_q');}},
+  {label:'Proximal humerus fracture — open with arthroplasty (23616)',fn:function(){doC('23616','sho_bilat_q');}},
+]);});
+
+step('sho_fx_graft',function(){return q('What type of graft?',[
+  {label:'Autograft',fn:function(){goGraft('sho_bilat_q');}},
+  {label:'Allograft',fn:function(){goGraft('sho_bilat_q');}},
+  {label:'No additional graft needed',fn:function(){go('sho_bilat_q');}},
+]);});
+
+// SHOULDER BICEPS
+step('sho_bic',function(){return q('Biceps tendon procedure?',[
+  {label:'Arthroscopic biceps tenodesis (29828)',fn:function(){doC('29828','done');}},
+  {label:'Open biceps tenodesis (23430)',fn:function(){doC('23430','sho_bilat_q');}},
+  {label:'Remove/transplant biceps tendon (23440)',fn:function(){doC('23440','sho_bilat_q');}},
+],'29828 (arthroscopic tenodesis) and 23430 (open tenodesis) should not be reported together. If arthroscopy is performed and tenodesis is done through a separate mini-open incision, consider whether the arthroscopic or open code is most appropriate based on primary technique.');});
+
+// ── HIP ─────────────────────────────────────────────────────────────────────
+step('hip1',function(){return q('What is the primary hip procedure?',[
+  {label:'Hip arthroscopy',fn:function(){go('hip_scope');}},
+  {label:'Hip arthroplasty (hemi or THA)',fn:function(){go('hip_arth');}},
+  {label:'Hip fracture treatment',fn:function(){go('hip_fx');}},
+]);});
+
+// HIP ARTHROSCOPY
+step('hip_scope',function(){return q('Primary hip arthroscopic procedure?',[
+  {label:'Femoroplasty — cam FAI decompression (29914)',fn:function(){doC('29914','hip_scope_add');}},
+  {label:'Acetabuloplasty — pincer FAI decompression (29915)',fn:function(){doC('29915','hip_scope_add');}},
+  {label:'Labral repair (29916)',fn:function(){doC('29916','hip_scope_add');}},
+  {label:'Debridement/chondroplasty (29862)',fn:function(){doC('29862','hip_scope_add');}},
+  {label:'Synovectomy (29863)',fn:function(){doC('29863','hip_scope_add');}},
+  {label:'Loose body/FB removal (29861)',fn:function(){doC('29861','hip_scope_add');}},
+  {label:'Diagnostic only (29860)',fn:function(){doC('29860','done');}},
+],'Hip arthroscopy for FAI: combined cam + pincer decompression — use the higher-wRVU code as primary (29914 cam or 29915 pincer), the other is reported as additional. 29916 labral repair is commonly performed with FAI decompression. Document alpha angle, offset measurements, and impingement pattern to support medical necessity.');});
+
+step('hip_scope_add',function(){return q('Were additional hip arthroscopic procedures performed?',[
+  {label:'No additional procedures',fn:function(){go('hip_scope_bilat_q');}},
+  {label:'Also labral repair (29916)',fn:function(){save();addC('29916');S.step='hip_scope_bilat_q';draw();}},
+  {label:'Also femoroplasty (29914)',fn:function(){save();addC('29914');S.step='hip_scope_bilat_q';draw();}},
+  {label:'Also acetabuloplasty (29915)',fn:function(){save();addC('29915');S.step='hip_scope_bilat_q';draw();}},
+  {label:'Also debridement (29862)',fn:function(){save();warn('Debridement 29862: report only when a distinct chondral/synovial debridement was performed beyond the primary procedure.');addC('29862');S.step='hip_scope_bilat_q';draw();}},
+]);});
+
+// HIP ARTHROPLASTY
+step('hip_arth',function(){return q('Hip arthroplasty type?',[
+  {label:'Hemiarthroplasty — partial hip replacement (27125)',fn:function(){doC('27125','hip_bilat');}},
+  {label:'Total hip arthroplasty — primary (27130)',fn:function(){doC('27130','hip_bilat');}},
+  {label:'THA — conversion from prior surgery (27132)',fn:function(){save();warn('27132 is used when converting a prior procedure (hemiarthroplasty, surface replacement, failed fixation) to a THA. Document prior procedure, reason for conversion, and complexity compared to primary THA.');addC('27132');S.step='hip_bilat';draw();}},
+  {label:'Revision THA — both components (27134)',fn:function(){doC('27134','done');}},
+  {label:'Revision THA — acetabular component only (27137)',fn:function(){doC('27137','done');}},
+  {label:'Revision THA — femoral component only (27138)',fn:function(){doC('27138','done');}},
+],'Bilateral THA same session: rare but possible. Use Mod 50 or LT/RT per payer. Total hip arthroplasty includes all component placements — do not unbundle acetabular cup and femoral stem as separate codes.');});
+
+step('hip_bilat',function(){return q('Bilateral procedure?',[
+  {label:'No — unilateral',fn:function(){go('hip_nav');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral THA same session: Mod 50 or LT/RT per payer policy. Medicare pays 150% of unilateral rate.');S.step='hip_nav';draw();}},
+]);});
+
+// HIP FRACTURE
+step('hip_fx',function(){return q('Hip/femur fracture treatment?',[
+  {label:'CRIF proximal femur — closed reduction internal fixation (27235)',fn:function(){doC('27235','done');}},
+  {label:'ORIF femoral neck — open reduction internal fixation (27236)',fn:function(){doC('27236','done');}},
+  {label:'ORIF intertrochanteric fracture (27244)',fn:function(){doC('27244','done');}},
+  {label:'ORIF peritrochanteric fracture — cephalomedullary nail (27245)',fn:function(){doC('27245','done');}},
+],'27244 vs 27245: use 27245 when a cephalomedullary nail (IM nail with cephalic fixation) is used. Use 27244 for sliding hip screw / plate constructs. Document fracture classification (AO/OTA), implant type and brand, and reduction achieved.');});
+
+// ── ANKLE / FOOT ────────────────────────────────────────────────────────────
+step('ank1',function(){return q('What is the primary ankle/foot procedure?',[
+  {label:'Total ankle arthroplasty (TAA)',fn:function(){go('ank_arth');}},
+  {label:'Ankle arthroscopy',fn:function(){go('ank_scope');}},
+  {label:'Achilles tendon repair',fn:function(){go('ank_ach');}},
+  {label:'Ankle ligament repair / stabilization',fn:function(){go('ank_lig');}},
+  {label:'Ankle fracture treatment',fn:function(){go('ank_fx');}},
+]);});
+
+// ANKLE ARTHROSCOPY
+step('ank_scope',function(){return q('Primary ankle arthroscopic procedure?',[
+  {label:'Debridement extensive — osteophyte removal/impingement (29898)',fn:function(){doC('29898','ank_scope_add');}},
+  {label:'Debridement limited (29897)',fn:function(){doC('29897','ank_scope_add');}},
+  {label:'Synovectomy (29895)',fn:function(){doC('29895','ank_scope_add');}},
+  {label:'Loose body/FB removal (29894)',fn:function(){doC('29894','ank_scope_add');}},
+]);});
+
+step('ank_scope_add',function(){return q('Were additional arthroscopic procedures performed?',[
+  {label:'No additional procedures',fn:function(){go('done');}},
+  {label:'Also loose body removal (+29894)',fn:function(){save();addC('29894');S.step='done';draw();}},
+]);});
+
+// ACHILLES
+step('ank_ach',function(){return q('Achilles tendon procedure?',[
+  {label:'Primary repair — acute tear (27650)',fn:function(){doC('27650','ank_bilat_q');}},
+  {label:'Repair with graft augmentation (27652)',fn:function(){doC('27652','ank_ach_graft');}},
+  {label:'Secondary/delayed/neglected repair (27654)',fn:function(){doC('27654','ank_ach_graft');}},
+],'27650 vs 27652: use 27652 when a graft (allograft or local tendon transfer) is required to bridge a defect. 27654 for chronic/neglected ruptures. Document tear location, gap size, tissue quality, and augmentation rationale.');});
+
+step('ank_ach_graft',function(){return q('Was a graft used?',[
+  {label:'Yes — allograft or tendon transfer graft',fn:function(){goGraft('ank_bilat_q');}},
+  {label:'No graft (primary repair only)',fn:function(){go('ank_bilat_q');}},
+]);});
+
+// ANKLE LIGAMENT
+step('ank_lig',function(){return q('Ankle ligament procedure?',[
+  {label:'Brostrom — primary lateral ligament repair (27695)',fn:function(){doC('27695','ank_bilat_q');}},
+  {label:'Modified Brostrom — both lateral ligaments (27696)',fn:function(){doC('27696','ank_bilat_q');}},
+  {label:'Secondary / neglected lateral ligament repair (27698)',fn:function(){doC('27698','ank_lig_graft');}},
+],'Brostrom 27695 vs 27696: 27696 is used when both the ATFL and CFL are repaired. Document ligaments repaired, tissue quality, and whether augmentation was performed. Augmentation with InternalBrace or similar device: document device type in operative note; reimbursement varies by payer.');});
+
+step('ank_lig_graft',function(){return q('Was graft augmentation used?',[
+  {label:'Yes — allograft or tendon graft',fn:function(){goGraft('ank_bilat_q');}},
+  {label:'No graft',fn:function(){go('ank_bilat_q');}},
+]);});
+
+// ANKLE FRACTURE
+step('ank_fx',function(){return q('Ankle fracture type?',[
+  {label:'Medial malleolus — open treatment (27766)',fn:function(){doC('27766','ank_fx_add');}},
+  {label:'Posterior malleolus — open treatment (27769)',fn:function(){doC('27769','ank_fx_add');}},
+  {label:'Fibula / lateral malleolus — open treatment (27792)',fn:function(){doC('27792','ank_fx_add');}},
+  {label:'Bimalleolar ankle fracture — open treatment (27814)',fn:function(){doC('27814','ank_fx_add');}},
+  {label:'Trimalleolar ankle fracture — open treatment (27822)',fn:function(){doC('27822','ank_fx_add');}},
+],'Trimalleolar fracture (27822) includes all three malleoli — do not add separate codes for individual malleoli if billing 27822. For bimalleolar (27814), same rule applies. If only one malleolus required fixation, use the appropriate single-malleolus code.');});
+
+step('ank_fx_add',function(){return q('Was a syndesmotic injury also repaired?',[
+  {label:'No syndesmotic repair',fn:function(){go('ank_bilat_q');}},
+  {label:'Yes — syndesmotic fixation performed',fn:function(){save();warn('Syndesmotic fixation (tight-rope or screw fixation) is included in the primary ankle fracture repair code and is not separately reportable. Do not add a separate code for the syndesmotic repair when billed with ankle fracture ORIF codes.');S.step='ank_bilat_q';draw();}},
+]);});
+
+// ── ELBOW ────────────────────────────────────────────────────────────────────
+step('elb1',function(){return q('What is the primary elbow procedure?',[
+  {label:'Elbow arthroscopy',fn:function(){go('elb_scope');}},
+  {label:'UCL/LCL ligament repair or reconstruction',fn:function(){go('elb_lig');}},
+  {label:'Lateral epicondylitis repair',fn:function(){go('elb_epi');}},
+  {label:'Distal biceps tendon repair',fn:function(){go('elb_bic');}},
+]);});
+
+// ELBOW ARTHROSCOPY
+step('elb_scope',function(){return q('Primary elbow arthroscopic procedure?',[
+  {label:'Debridement extensive (29838)',fn:function(){doC('29838','elb_scope_add');}},
+  {label:'Debridement limited (29837)',fn:function(){doC('29837','elb_scope_add');}},
+  {label:'Synovectomy complete (29836)',fn:function(){doC('29836','elb_scope_add');}},
+  {label:'Synovectomy partial (29835)',fn:function(){doC('29835','elb_scope_add');}},
+  {label:'Loose body/FB removal (29834)',fn:function(){doC('29834','elb_scope_add');}},
+  {label:'Diagnostic only (29830)',fn:function(){doC('29830','elb_bilat_q');}},
+],'Elbow arthroscopy has high audit risk for appropriate debridement coding. Document specific pathology addressed (osteophytes, synovitis, loose bodies) and confirm each reported code reflects distinct, separately performed work.');});
+
+step('elb_scope_add',function(){return q('Were additional arthroscopic procedures performed?',[
+  {label:'No additional procedures',fn:function(){go('elb_bilat_q');}},
+  {label:'Also loose body removal (+29834)',fn:function(){save();addC('29834');S.step='elb_bilat_q';draw();}},
+]);});
+
+// ELBOW LIGAMENT
+step('elb_lig',function(){return q('Elbow ligament procedure?',[
+  {label:'UCL repair — primary medial ligament (24345)',fn:function(){doC('24345','elb_bilat_q');}},
+  {label:'UCL reconstruction — Tommy John (24346)',fn:function(){doC('24346','elb_lig_graft');}},
+  {label:'LCL repair — primary lateral ligament (24343)',fn:function(){doC('24343','elb_bilat_q');}},
+  {label:'LCL reconstruction — lateral (24344)',fn:function(){doC('24344','elb_lig_graft');}},
+],'UCL reconstruction (24346) requires graft harvesting. Document donor site. Palmaris longus autograft (same operative field): consider 20924 for tendon graft from distant site if harvested separately. Document preoperative imaging, instability testing, and failure of conservative treatment.');});
+
+step('elb_lig_graft',function(){return q('Was a graft used?',[
+  {label:'Yes — palmaris longus or gracilis autograft',fn:function(){goGraft('elb_bilat_q');}},
+  {label:'Yes — allograft',fn:function(){goGraft('elb_bilat_q');}},
+  {label:'No graft (primary repair)',fn:function(){go('elb_bilat_q');}},
+]);});
+
+// ELBOW EPICONDYLITIS
+step('elb_epi',function(){return q('Lateral epicondylitis repair technique?',[
+  {label:'Percutaneous tenotomy (24357)',fn:function(){doC('24357','elb_bilat_q');}},
+  {label:'Open debridement (24358)',fn:function(){doC('24358','elb_bilat_q');}},
+  {label:'Open debridement with reattachment (24359)',fn:function(){doC('24359','elb_bilat_q');}},
+],'24357 (percutaneous) vs 24358/24359 (open): distinguish clearly in operative note. 24359 is used when the extensor origin is detached and reattached. Document tendon quality, extent of degeneration, and whether primary repair or debridement only was performed. Avoid overcoding to 24359 if no actual reattachment was performed.');});
+
+// ELBOW BICEPS
+step('elb_bic',function(){return q('Distal biceps repair?',[
+  {label:'Repair ruptured distal biceps tendon (24342)',fn:function(){doC('24342','elb_bilat_q');}},
+],'Document complete vs partial rupture, repair technique (single vs double incision), fixation method (suture anchor, endobutton, or interference screw), and tunnel preparation. Partial tears repaired primarily: document tear extent as percentage of tendon width.');});
+
+step('elb_bic_graft',function(){return q('Was a graft used?',[
+  {label:'No — primary repair without graft',fn:function(){go('elb_bilat_q');}},
+  {label:'Yes — allograft or autograft for augmentation',fn:function(){goGraft('elb_bilat_q');}},
+]);});
+
+// ── DONE ─────────────────────────────────────────────────────────────────────
+var OP_NOTES={
+  '20924':'Document donor tendon site (palmaris longus, plantaris, gracilis, or toe extensor), harvest technique, graft dimensions, and separate incision location. Confirm graft length and width adequate for reconstruction.',
+  '20931':'Document structural allograft brand, dimensions, and load-bearing application. Distinguish from morselized allograft (20930).',
+  '20936':'Local autograft same incision: $0 Medicare wRVU. Document graft source (lamina, spinous process, or local bone), volume harvested, and confirm no separate incision was used. Submit to commercial payers — many reimburse this code.',
+  '20937':'Document separate iliac crest incision site, morselized graft harvest volume, and harvest site closure. Separate incision distinguishes from 20936.',
+  '20938':'Document separate iliac crest incision, structural cortical-cancellous graft dimensions, and harvest site closure. Confirm load-bearing structural application.',
+  '20985':'Document navigation system brand, registration method (CT-based, fluoroscopic, or imageless), registration accuracy confirmed, and use of navigation data for implant positioning. Verify commercial payer coverage before billing.',
+  '23410':'Document acute tear: mechanism, time from injury, tear size and location, tissue quality, repair technique, number of anchors, and suture configuration. Distinguish from 23412 by documenting acute presentation.',
+  '23412':'Document chronic tear: symptom duration, tissue quality (retraction grade, fraying), mobilization techniques, margin convergence if needed, number of anchors, and suture configuration. Note complete vs partial repair.',
+  '23455':'Document Bankart lesion type, labral mobilization, minimum 3 suture anchors for full repair, post-repair stability at 90 degrees abduction and external rotation, and glenoid bone loss percentage.',
+  '23460':'Document glenoid bone loss percentage, coracoid harvest technique, coracoid placement flush with glenoid face, fixation construct, and any concurrent capsular repair.',
+  '23470':'Document indication (fracture vs arthritis vs cuff tear arthropathy), component brand and sizing, cementation status, subscapularis repair, and range of motion confirmed at closure.',
+  '23472':'Document implant configuration (anatomic TSA vs reverse RSA) explicitly — both use 23472. Record glenoid fixation, humeral component type and stem length, subscapularis repair status, and final ROM tested at closure.',
+  '23473':'Document reason for revision, humeral component revised (23473 = humeral only), bone stock quality, implant brand and sizing, and final alignment.',
+  '23474':'Document complete component exchange (both glenoid and humeral), reason for revision, bone loss management, and anatomic vs reverse configuration used.',
+  '23515':'Document fracture classification (Robinson), reduction quality, plate position, screw number, and fluoroscopic AP and axillary confirmation of reduction and hardware.',
+  '23615':'Document Neer fracture classification, reduction quality, implant type (plate vs nail vs percutaneous), and fluoroscopic AP and axillary lateral confirmation.',
+  '23616':'Document fracture non-reconstructability, prosthesis type, tuberosity reattachment technique, and post-implant fluoroscopic confirmation of position.',
+  '24342':'Document complete biceps rupture on MRI, surgical approach (single vs dual incision), fixation method (suture anchor, endobutton, interference screw), bone tunnel preparation, and final repair integrity.',
+  '24344':'Document LCL complex deficiency, graft source, tunnel placement at lateral epicondyle and proximal ulna, fixation method, and final posterolateral rotatory stability confirmed.',
+  '24346':'Document UCL insufficiency on MRI and stress testing, graft source (palmaris longus, gracilis, or allograft), docking or interference screw fixation, tunnel dimensions (humeral and ulnar), graft tension at 30 degrees flexion, final valgus stability confirmed, and any concurrent ulnar nerve transposition.',
+  '24357':'Document percutaneous technique, location of tenotomy at lateral epicondyle, extent of release, and no open exposure of extensor origin.',
+  '24358':'Document open exposure, pathologic tissue debrided (tendinotic vs partial tear), and absence of reattachment (distinguishes from 24359).',
+  '24359':'Document extensor origin detachment, pathologic tissue excision, drill holes at epicondyle, and reattachment with sutures or anchors confirmed.',
+  '27130':'Document cup inclination and anteversion on intraoperative fluoroscopy (targets: 40 degrees inclination, 15-20 degrees anteversion). Record stem type, offset, and sizing. Note leg length change and hip stability at closure. Implant costs are facility claim items (HCPCS C-codes).',
+  '27134':'Document reason for revision, Paprosky bone loss classification for acetabulum and femur, augments/cages/structural allograft used, constraint level, and final component positions. Implant costs are facility claim items.',
+  '27236':'Document Garden classification, reduction quality on AP and lateral, fixation construct (3 parallel screws or sliding hip screw), and vascular status documentation.',
+  '27244':'Document AO/OTA fracture classification, implant type (sliding hip screw with side plate), lag screw position confirmed on AP and lateral (inferior and central in femoral head), and tip-apex distance under 25mm.',
+  '27245':'Document fracture classification, cephalomedullary nail brand and sizing, cephalic fixation type (blade vs screw, single vs dual), rotational stability confirmed, and fluoroscopic AP, lateral, and cross-table views.',
+  '27415':'Document OCD lesion size and location, donor site selection, allograft preparation, press-fit confirmation, fixation if used, and final congruency on arthroscopic or fluoroscopic assessment.',
+  '27418':'Document tibial tubercle osteotomy dimensions (medialization and anteriorization in mm), fixation hardware, pre- and post-correction TT-TG distance, and any concurrent trochleoplasty.',
+  '27446':'Document compartment selection (confirm opposite compartment and patellofemoral joint are preserved), component brand and sizing, coronal alignment, and any concurrent procedures. UKA requires intact ACL, correctable deformity, and confined single-compartment disease.',
+  '27447':'Document component brand and sizes (femoral, tibial, patellar if resurfaced). Record tibial slope, posterior condylar offset, and fluoroscopic AP and lateral alignment. Document constraint level and any augments. HCPCS implant costs (C1776 etc.) are facility claim items, not the surgeon claim.',
+  '27486':'Document reason for revision, which component revised, AORI bone loss classification, augments used, final alignment, and stability at closure. Use 27486 for single-component revision — 27487 for both components.',
+  '27487':'Document complete femoral and tibial component exchange. Record reason, AORI bone loss, augments/stems/cones, patellar component status, constraint level, and final alignment. Implant costs are facility claim items.',
+  '27535':'Document Schatzker fracture classification, approach, articular reduction quality on CT or fluoroscopy, implant type, and final alignment.',
+  '27650':'Document mechanism (acute vs chronic), time from injury, gap size at repair, tissue quality, suture technique (Krackow or equivalent), number of sutures, end-to-end approximation, and ankle plantarflexion confirmed at closure.',
+  '27695':'Document lateral ankle instability on stress testing (talar tilt over 10 degrees or anterior drawer over 10mm vs contralateral), ATFL repair technique, suture configuration, periosteal augmentation if InternalBrace used, and final stability.',
+  '27696':'Document ATFL and CFL repair as separate distinct steps. Record each ligament repaired, suture configuration, and final stability confirmed.',
+  '27766':'Document medial malleolus fracture pattern, reduction quality, implant type (lag screws, T-plate, or tension band), and fluoroscopic confirmation.',
+  '27792':'Document Danis-Weber classification, plate position (lateral vs posterior antiglide), screw configuration, and fluoroscopic AP, lateral, and mortise view confirmation.',
+  '27814':'Document medial and lateral malleolus fixation as distinct steps. Record each implant and fluoroscopic mortise view confirming joint congruency.',
+  '27822':'Document fixation of all three malleoli as distinct steps. Record each implant, posterior malleolus fixation rationale (over 25% articular surface or unstable), syndesmotic evaluation and repair status, and final mortise congruency.',
+  '29806':'Document direction of instability, capsular tissue quality, volume of plication, suture configuration, and any concurrent labral reattachment. Note Hill-Sachs and glenoid bone loss addressed.',
+  '29807':'Document SLAP type (I=fraying, II=detachment, III=bucket handle biceps intact, IV=bucket handle into biceps), labral tissue quality, anchor placement at superior labral-biceps junction, and biceps anchor stability confirmed.',
+  '29824':'Document distal clavicle resection amount in mm, confirmation of adequate subacromial and acromioclavicular space on dynamic assessment. Report with primary arthroscopy code.',
+  '29826':'Document subacromial decompression as a distinct step: bursectomy performed, anterior acromioplasty with bone removed (mm), and coracoacromial ligament status. Never reported alone — must accompany a primary shoulder arthroscopy code.',
+  '29827':'Document tear size (cm), retraction grade (Patte I-III), tissue quality (good/moderate/poor), number and placement of anchors, suture configuration (single row, double row, or transosseous equivalent), and final gap closure.',
+  '29828':'Document tenotomy vs tenodesis decision rationale, fixation location (subpectoral or suprapectoral), hardware brand, and biceps groove status. Distinguish from open tenodesis (23430).',
+  '29862':'Document chondral lesion grade and location (acetabular vs femoral head), debridement technique, and area treated. Note microfracture if performed.',
+  '29873':'Document lateral retinaculum released under arthroscopic visualization, medial patellar mobility confirmed post-release (patellar tilt corrected), and absence of medial injury.',
+  '29877':'Document specific chondral pathology treated (ICRS/Outerbridge grade, location), technique (shaving vs chondroplasty), and area of involvement. Do not report if debridement is incidental to the primary procedure.',
+  '29880':'Document both medial and lateral meniscal pathology independently. Each compartment requires its own tear description, pattern, and resection technique. Both compartments must have genuine pathology.',
+  '29881':'Document which compartment (medial or lateral), tear pattern (horizontal, vertical, radial, complex), location (posterior horn, body, anterior horn), and amount of tissue resected. Confirm remnant is stable and smooth.',
+  '29882':'Document tear type and location, repair technique (inside-out, outside-in, or all-inside), number of sutures/devices, healing zone vascularity assessment, and repair stability confirmed on probing.',
+  '29883':'Document medial and lateral repairs independently. Record repair technique, number of fixation devices per compartment, and repair integrity confirmed for each.',
+  '29888':'Document graft type (BTB, hamstring, allograft), tunnel placement (anatomic single or double bundle), graft diameter, fixation hardware and brand, graft tensioning, and stability confirmed with Lachman and pivot shift at closure.',
+  '29889':'Document PCL reconstruction technique (tibial inlay vs transtibial), graft type and diameter, tunnel positions confirmed fluoroscopically, fixation method, and knee stability at closure.',
+  '29914':'Document preoperative alpha angle, extent of femoral head-neck osteoplasty, fluoroscopic clearance confirmed dynamically, and concurrent acetabular or labral procedures.',
+  '29915':'Document pincer morphology type, rim trimming technique and amount of bone removed, labral detachment and re-fixation if performed, and fluoroscopic confirmation.',
+  '29916':'Document labral tear type and extent, suture anchor number and placement, repair technique, and labral seal restored. Document graft source if labral reconstruction performed.',
+};
+
+
+// ── BUNDLING RULES ────────────────────────────────────────────────────────────
+// Returns array of bundling warning strings based on current code set
+function checkBundling(){
+  var codes = S.codes;
+  var warnings = [];
+  var has = function(c){ return codes.indexOf(''+c) >= 0; };
+  var hasAny = function(arr){ return arr.some(function(c){return codes.indexOf(''+c)>=0;}); };
+
+  // Arthroscopy multiple procedure rule - applies to all 29xxx surgical codes
+  var scopeCodes = codes.filter(function(c){
+    return /^29(8[0-9][0-9]|9[01][0-9])/.test(c) && c !== '29826';
+  });
+  if(scopeCodes.length > 1){
+    warnings.push('Arthroscopy multiple procedure rule: ' + scopeCodes.length + ' arthroscopic procedure codes billed. CMS pays the highest-wRVU code at 100% and each additional at 25% of fee schedule — not 50%. This applies automatically; submit all codes. Ensure documentation supports each additional procedure as distinct and necessary.');
+  }
+
+  // 29880 vs 29881: mutually exclusive
+  if(has('29880') && has('29881')){
+    warnings.push('BUNDLING ERROR: 29880 (medial AND lateral meniscectomy) and 29881 (medial OR lateral) are mutually exclusive — cannot bill both. Use 29880 if both compartments were treated, or 29881 for a single compartment.');
+  }
+  // 29882 or 29883 same compartment as 29880/29881
+  if((has('29882') || has('29883')) && (has('29880') || has('29881'))){
+    warnings.push('BUNDLING CAUTION: Meniscectomy (29880/29881) and meniscal repair (29882/29883) billed together. CMS may bundle these if performed on the same compartment. Document that the repair and resection were performed on different compartments (e.g., medial repair + lateral partial meniscectomy). If both procedures were in the same compartment, only the higher-value code is payable.');
+  }
+  // 29827 (RCR) with 29822/29823 (debridement)
+  if(has('29827') && (has('29822') || has('29823'))){
+    warnings.push('BUNDLING RISK: 29827 (rotator cuff repair) with 29822/29823 (debridement) billed together. Incidental debridement performed as part of rotator cuff repair approach is bundled into 29827. Only bill debridement separately if a distinct additional chondral or soft tissue debridement was performed at a separate anatomic location with independent clinical significance. High audit risk.');
+  }
+  // 29870 diagnostic with any surgical arthroscopy
+  if(has('29870') && scopeCodes.filter(function(c){return c!=='29870';}).length > 0){
+    warnings.push('BUNDLING ERROR: 29870 (diagnostic arthroscopy) cannot be billed when any surgical arthroscopic procedure was performed on the same joint same session. The diagnostic component is included in the surgical procedure. Remove 29870 from the claim.');
+  }
+  // 29862 debridement with 29914/29915/29916 hip FAI
+  if(has('29862') && (has('29914') || has('29915') || has('29916'))){
+    warnings.push('BUNDLING CAUTION: 29862 (hip debridement) with FAI decompression or labral repair billed together. Debridement incidental to the FAI procedure is bundled. Only bill 29862 separately if a distinct chondroplasty was performed at a location and extent beyond what is inherent to the FAI decompression or labral repair.');
+  }
+  // 29805 diagnostic shoulder with any surgical shoulder scope
+  var shoScopeSurgical = ['29806','29807','29819','29820','29821','29822','29823','29824','29825','29827','29828'];
+  if(has('29805') && hasAny(shoScopeSurgical)){
+    warnings.push('BUNDLING ERROR: 29805 (diagnostic shoulder arthroscopy) cannot be billed when a surgical shoulder arthroscopic procedure was performed. The diagnostic component is included in the surgical code. Remove 29805.');
+  }
+  // 29830 diagnostic elbow with any surgical elbow scope
+  var elbScopeSurgical = ['29834','29835','29836','29837','29838'];
+  if(has('29830') && hasAny(elbScopeSurgical)){
+    warnings.push('BUNDLING ERROR: 29830 (diagnostic elbow arthroscopy) cannot be billed with surgical elbow arthroscopy on the same session. Remove 29830.');
+  }
+  // 29860 diagnostic hip with any surgical hip scope
+  var hipScopeSurgical = ['29861','29862','29863','29914','29915','29916'];
+  if(has('29860') && hasAny(hipScopeSurgical)){
+    warnings.push('BUNDLING ERROR: 29860 (diagnostic hip arthroscopy) cannot be billed with surgical hip arthroscopy. Remove 29860.');
+  }
+  // 27447 TKA: do not add individual component codes (note: this is implicit but confirm)
+  // 27447 + any open knee ligament repair same session
+  var openKnee = ['27405','27407','27409','27427','27428','27429'];
+  if(has('27447') && hasAny(openKnee)){
+    warnings.push('BUNDLING REVIEW: TKA (27447) billed with an open knee ligament code. These may be separately reportable if a distinct ligament reconstruction was performed outside the arthroplasty, but verify NCCI and document that the ligament procedure was a distinct, medically necessary service separate from the arthroplasty.');
+  }
+  // 23472 TSA + 23430 biceps tenodesis: TSA includes subscapularis repair, 
+  // biceps tenodesis IS separately reportable but check 29828 vs 23430
+  if(has('23472') && has('29828')){
+    warnings.push('BUNDLING NOTE: RSA/TSA (23472) and arthroscopic biceps tenodesis (29828) — if the tenodesis was performed arthroscopically in the same session as an open arthroplasty, verify payer policy. Some payers bundle 29828 into 23472. Open biceps tenodesis (23430) performed concurrently with TSA is more commonly supported as separately billable.');
+  }
+  // Multiple ankle ORIF codes — check that 27814 not combined with individual malleolus codes
+  if(has('27814') && (has('27766') || has('27792'))){
+    warnings.push('BUNDLING ERROR: Bimalleolar fracture code 27814 includes both medial and lateral malleolus fixation. Do not also bill individual malleolus codes (27766, 27792) — they are bundled into 27814.');
+  }
+  if(has('27822') && (has('27766') || has('27792') || has('27769'))){
+    warnings.push('BUNDLING ERROR: Trimalleolar fracture code 27822 includes all three malleoli. Do not add individual malleolus codes (27766, 27769, 27792) — they are bundled into 27822.');
+  }
+  // 20936 $0 Medicare note
+  if(has('20936')){
+    warnings.push('PAYMENT NOTE: 20936 (local autograft same incision) carries $0 wRVU under Medicare — no physician payment from Medicare. Submit to commercial payers; many reimburse this code. Include on the claim regardless.');
+  }
+
+  return warnings;
+}
+
+function renderDone(){
+  var codes=S.codes.filter(function(c,i){return S.codes.indexOf(c)===i;});
+
+  // Auto-apply Mod 51 / arthroscopy rule
+  // Separate codes into groups by mult indicator
+  var m2codes = codes.filter(function(c){return MULT2.has(c);});
+  var m3codes = codes.filter(function(c){return MULT3.has(c);});
+  var exemptCodes = codes.filter(function(c){return !MULT2.has(c)&&!MULT3.has(c);});
+
+  // For MULT2: sort by wRVU desc. Primary = highest. Rest get Mod 51 (-50%).
+  m2codes.sort(function(a,b){return ((DB[b]||{w:0}).w)-((DB[a]||{w:0}).w);});
+  // For MULT3 (arthroscopy): sort by wRVU desc. Primary = highest. Rest get 25%.
+  m3codes.sort(function(a,b){return ((DB[b]||{w:0}).w)-((DB[a]||{w:0}).w);});
+
+  // Build modifier map: code -> {mod, reduction}
+  var modMap = {};
+  m2codes.forEach(function(c,i){
+    if(i===0) modMap[c]={mod:'',reduction:1.0};
+    else modMap[c]={mod:' -51',reduction:0.5};
+  });
+  m3codes.forEach(function(c,i){
+    if(i===0) modMap[c]={mod:'',reduction:1.0};
+    else modMap[c]={mod:' -51',reduction:0.25};
+  });
+  exemptCodes.forEach(function(c){modMap[c]={mod:'',reduction:1.0};});
+
+  // Total weighted: use full wRVU for wRVU display, but show adjusted payment
+  var tw=totalW();
+  var adjPayment = codes.reduce(function(sum,c){
+    var w=(DB[c]||{w:0}).w;
+    var r=(modMap[c]||{reduction:1.0}).reduction;
+    return sum + w*CF*r;
+  },0);
+  var rows=codes.map(function(code){
+    var db=DB[code]||{d:code,w:0};
+    var info=modMap[code]||{mod:'',reduction:1.0};
+    var fullPay=(db.w*CF).toFixed(0);
+    var adjPay=(db.w*CF*info.reduction).toFixed(0);
+    var payDisplay = info.reduction<1.0
+      ? '$'+adjPay+' <span style="text-decoration:line-through;color:var(--muted);font-size:10px">$'+fullPay+'</span>'
+      : '$'+adjPay;
+    var modTag = info.mod ? '<span style="background:#2a1f0a;color:#ffb74d;font-size:10px;padding:2px 5px;border-radius:3px;margin-left:5px">Mod 51'+(info.reduction===0.25?' 25%':' 50%')+'</span>' : '';
+    var aoTag=db.ao?'<span class="ao-tag">add-on</span>':'';
+    return '<div class="code-row"><div class="code-info"><span class="code-num">'+code+aoTag+modTag+'</span><div class="code-desc">'+db.d+'</div></div><div class="code-pay"><div class="code-wrvu">'+db.w+' wRVU</div><div class="code-dollar">'+payDisplay+'</div></div></div>';
+  }).join('');
+  var bundleWarnings=checkBundling();
+  var allWarns=S.warns.concat(bundleWarnings);
+  var warnHtml=allWarns.length?'<div class="warns">'+allWarns.map(function(w){return'<div class="warn-item">'+w+'</div>';}).join('')+'</div>':'';
+  var noteCodes=codes.filter(function(c){return OP_NOTES[c];});
+  var noteHtml=noteCodes.length?'<div class="op-notes"><h4>Operative note documentation tips</h4>'+noteCodes.map(function(c){return'<div class="note-item"><div class="note-code">'+c+' — '+(DB[c]||{d:c}).d+'</div><div class="note-text">'+OP_NOTES[c]+'</div></div>';}).join('')+'</div>':'';
+  return'<div class="done-wrap"><div class="done-hdr"><h3>Billable code set</h3><span class="wrvu-badge">'+tw.toFixed(2)+' total wRVU</span></div><div class="code-list">'+rows+'</div>'+warnHtml+noteHtml+'<div class="total-row"><div><div class="total-label">Total wRVU</div><div class="total-dollar">Est. physician payment (after Mod 51 adjustments)</div></div><div style="text-align:right"><div class="total-val">'+tw.toFixed(2)+'</div><div class="total-dollar">$'+adjPayment.toFixed(0)+'</div></div></div></div><button class="restart-btn" onclick="restart()">Start over</button>';
+}
+
+function renderGraft(){
+  var btns=GRAFTS.map(function(g){
+    var sel=S.gsel.indexOf(g.id)>=0;
+    return'<button class="gtog'+(sel?' sel':'')+'" data-gid="'+g.id+'" onclick="toggleG(\''+g.id+'\')"><span class="chk">'+(sel?'✓':'')+'</span>'+g.label+'</button>';
+  }).join('');
+  return'<p class="qlabel">Was a graft used? Select all that apply:</p><div class="graft-grid">'+btns+'</div><button class="confirm-btn" onclick="confirmG()">Confirm graft selection</button>';
+}
+
+function renderCat(){
+  return'<div class="cat-grid">'+CATS.map(function(c){
+    return'<div class="cat-card" onclick="selCat(\''+c.id+'\')"><div class="cat-icon">'+c.icon+'</div><span class="cat-label">'+c.label+'</span><div class="cat-sub">'+c.sub+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function backBtn(){return S.hist.length>0?'<button class="back" onclick="back()">&#8592; Back</button>':'';}
+function progLine(){return S.cat?'<div class="prog"><span class="dot"></span><span class="cat-name">'+CAT_NAMES[S.cat]+'</span></div>':'';}
+
+function render(){
+  if(S.step==='cat')return renderCat();
+  if(S.step==='done')return backBtn()+progLine()+renderDone();
+  if(S.step==='graft')return backBtn()+progLine()+renderGraft();
+  var fn=STEPS[S.step];
+  if(!fn)return'<p style="color:var(--danger)">Unknown step: '+S.step+'</p>';
+  return backBtn()+progLine()+fn();
+}
+
+function selCat(id){save();S.cat=id;S.codes=[];S.warns=[];S.gsel=[];
+  var first={knee:'knee1',sho:'sho1',hip:'hip1',ank:'ank1',elb:'elb1'};
+  S.step=first[id];draw();}
+
+function restart(){S=newState();draw();}
+
+function draw(){
+  var el=document.getElementById('app');
+  if(el)el.innerHTML=render();
+}
+
+// ── TAA ──────────────────────────────────────────────────────────────────────
+step('ank_arth',function(){return q('Total ankle arthroplasty type?',[
+  {label:'TAA implant-preserving/osteoarticular reconstruction (27702)',fn:function(){doC('27702','ank_arth_rev');}},
+  {label:'TAA total component replacement (27703)',fn:function(){doC('27703','ank_arth_rev');}},
+  {label:'Removal of prior ankle implant only (27704)',fn:function(){save();warn('27704 for implant removal only. If converting to arthrodesis or new implant, code separately with Mod 22.');addC('27704');S.step='done';draw();}},
+],'TAA implant costs appear on the FACILITY claim (HCPCS C-codes) — not the surgeon claim. Document deformity correction, implant brand/sizing, fluoroscopic component position, and concurrent procedures. No dedicated revision TAA CPT — use primary code with Mod 22 for revisions.');});
+
+step('ank_arth_rev',function(){return q('Primary, revision, or bilateral?',[
+  {label:'Primary unilateral',fn:function(){go('done');}},
+  {label:'Revision of prior TAA',fn:function(){save();warn('No dedicated revision TAA CPT. Use 27702/27703 with Mod 22. Document reason for revision, components revised, and bone loss management.');S.step='done';draw();}},
+  {label:'Bilateral same session',fn:function(){save();warn('Bilateral TAA: Mod 50 or LT/RT per payer policy.');S.step='done';draw();}},
+]);});
+
+// ── PATELLA ───────────────────────────────────────────────────────────────────
+step('kn_arth_pat',function(){return q('Was the patella resurfaced with a patellar component?',[
+  {label:'Yes — patellar arthroplasty/resurfacing with implant (+27438)',fn:function(){save();addC('27438');warn('+27438 separately reportable when a patellar implant is placed during TKA — not bundled with 27447 under NCCI. Document patellar preparation, component sizing, and cementation as distinct steps. Patellar implant cost = facility claim item (HCPCS C-codes), not surgeon claim.');S.step='kn_arth_rev';draw();}},
+  {label:'No patellar resurfacing — bone surface only',fn:function(){go('kn_arth_rev');}},
+]);});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+step('kn_arth_nav',function(){return q('Was computer-assisted navigation or robotic assistance used?',[
+  {label:'Yes — computer-assisted/robotic navigation (+20985)',fn:function(){save();addC('20985');warn('+20985 is separately reportable as an add-on to arthroplasty. Document navigation system brand (Mako, ROSA, Stryker Nav, etc.), registration method, and that intraoperative positioning data was used to guide implant placement. Not all commercial payers cover robotic navigation — verify payer policy before billing.');S.step='done';draw();}},
+  {label:'No — conventional instrumentation',fn:function(){go('done');}},
+]);});
+
+step('hip_nav',function(){return q('Was computer-assisted navigation or robotic assistance used?',[
+  {label:'Yes — computer-assisted/robotic navigation (+20985)',fn:function(){save();addC('20985');warn('+20985 separately reportable as add-on to hip arthroplasty. Document navigation system brand and registration method. Verify commercial payer coverage.');S.step='done';draw();}},
+  {label:'No — conventional instrumentation',fn:function(){go('done');}},
+]);});
+
+// ── BILATERAL QUESTIONS ───────────────────────────────────────────────────────
+step('kn_bilat_q',function(){return q('Was this procedure performed bilaterally?',[
+  {label:'No — unilateral only',fn:function(){go('done');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral knee procedures: report primary code with Mod 50, or two line items with RT/LT modifiers per payer policy. Medicare pays 150% of unilateral rate. Both sides require independent documentation of medical necessity. For bilateral ACL reconstruction same session: each side billed separately with RT/LT.');S.step='done';draw();}},
+  {label:'Yes — staged bilateral (separate sessions)',fn:function(){save();warn('Staged bilateral (separate days): bill each session independently with RT/LT modifiers. No multiple-procedure reduction applies when performed on separate dates of service.');S.step='done';draw();}},
+]);});
+
+step('ank_bilat_q',function(){return q('Was this procedure performed bilaterally?',[
+  {label:'No — unilateral only',fn:function(){go('done');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral ankle/foot procedures same session: use Mod 50 or RT/LT per payer. Document independent medical necessity for each side. Bilateral Brostrom is uncommon — payers may request clinical justification.');S.step='done';draw();}},
+]);});
+
+step('elb_bilat_q',function(){return q('Was this procedure performed bilaterally?',[
+  {label:'No — unilateral only',fn:function(){go('done');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral elbow procedures same session: Mod 50 or LT/RT per payer. Bilateral UCL reconstruction is rare — document independent clinical indication for each side.');S.step='done';draw();}},
+]);});
+
+// ── REVISION vs PRIMARY NOTES (doc tips additions, OP_NOTES section handled below)
+
+step('sho_bilat_q',function(){return q('Was this procedure performed bilaterally?',[
+  {label:'No — unilateral only',fn:function(){go('done');}},
+  {label:'Yes — bilateral same session',fn:function(){save();warn('Bilateral shoulder procedures same session: Mod 50 or LT/RT per payer policy. Medicare pays 150% of unilateral rate. Document independent clinical indication for each side. Bilateral rotator cuff repair same session is uncommon — ensure documentation supports necessity.');S.step='done';draw();}},
+  {label:'Yes — staged bilateral (separate sessions)',fn:function(){save();warn('Staged bilateral: bill each session independently with LT/RT. No multiple-procedure reduction applies for separate dates.');S.step='done';draw();}},
+]);});
+
+step('hip_scope_bilat_q',function(){return q('Was this hip arthroscopy performed bilaterally?',[
+  {label:'No — unilateral',fn:function(){go('done');}},
+  {label:'Yes — bilateral hip arthroscopy same session',fn:function(){save();warn('Bilateral hip arthroscopy same session: Mod 50 or LT/RT per payer. Document independent FAI or labral pathology on each side confirmed by imaging and examination. Bilateral hip arthroscopy is uncommon and may trigger payer review.');S.step='done';draw();}},
+]);});
+
+S=newState();
+draw();
+</script>
+</body>
+</html>
