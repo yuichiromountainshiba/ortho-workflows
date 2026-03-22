@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spine Surgery Billing Interview — 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f8f8f6;color:#1a1a1a;padding:1.5rem;min-height:100vh}
+#wrap{max-width:700px;margin:0 auto;background:#fff;border-radius:12px;padding:2rem;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:14px;color:#666;margin-bottom:1.5rem;line-height:1.5}
+.qlabel{font-size:15px;font-weight:600;margin-bottom:4px;line-height:1.5}
+.qhint{font-size:12px;color:#888;margin-bottom:10px}
+.grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
+.btn{background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:9px 14px;font-size:13px;color:#1a1a1a;cursor:pointer;line-height:1.4;text-align:left;font-family:inherit;transition:background .1s}
+.btn:hover{background:#f2f2f0}
+.btn.on{border:2px solid #2563eb;background:#eff6ff;color:#1d4ed8}
+.cbtn{background:#1a1a1a;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;margin-top:4px;font-family:inherit}
+.cbtn:hover{background:#333}
+.panel{background:#f8f8f6;border-radius:10px;padding:1rem 1.25rem;margin-top:1rem;margin-bottom:.5rem}
+.panel h3{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:5px 0;border-bottom:1px solid #eee}
+.row:last-child{border-bottom:none}
+.cpt{font-size:13px;font-weight:600;white-space:nowrap;color:#1a1a1a;min-width:52px}
+.desc{font-size:12px;color:#555;flex:1}
+.wrvu{font-size:13px;font-weight:600;color:#2563eb;white-space:nowrap}
+.tbar{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:9px 14px;margin-bottom:.75rem}
+.tlabel{font-size:13px;color:#666}
+.tval{font-size:18px;font-weight:600;color:#1a1a1a}
+.warn{font-size:12px;color:#78350f;background:#fef3c7;border-radius:8px;padding:8px 12px;margin-bottom:6px;line-height:1.5;border-left:3px solid #f59e0b}
+.back{font-size:12px;color:#888;background:none;border:none;cursor:pointer;padding:0;margin-bottom:.75rem;text-decoration:underline;font-family:inherit;display:block}
+.prog{font-size:12px;color:#aaa;margin-bottom:.75rem}
+.note{font-size:11px;color:#999;margin-top:1rem;line-height:1.6;border-top:1px solid #eee;padding-top:1rem}
+.restart{background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:6px 14px;font-size:13px;color:#666;cursor:pointer;font-family:inherit}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+@media(max-width:480px){.cat-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="wrap">
+<h1>Spine Surgery Billing Tool</h1>
+<p style="font-size:15px;color:#444;margin-bottom:2px;font-weight:500">by Mira Health</p>
+<p class="sub">CPT coding and Medicare 2026 wRVU rates with non-QPP conversion factor $33.40<br>Answer each question to build your billable code list.</p>
+<div id="root"></div>
+</div>
+<script>
+var CF = 33.40;
+
+var DB = {
+  22551:{d:'ACDF with discectomy/decompression, single level',w:24.38},
+  22552:{d:'ACDF each additional interspace (add-on)',w:6.34,ao:1},
+  22554:{d:'ACDF with minimal discectomy, single level',w:17.25},
+  22856:{d:'Cervical total disc arthroplasty, single level',w:23.45},
+  22858:{d:'Cervical TDA second level (add-on)',w:8.19,ao:1},
+  22861:{d:'Revision cervical total disc arthroplasty',w:32.53},
+  22845:{d:'Anterior instrumentation 2-3 segments (add-on)',w:11.64,ao:1},
+  22849:{d:'Reinsertion of spinal fixation device',w:18.69},
+  22852:{d:'Removal of non-segmental instrumentation / plate',w:9.14},
+  22853:{d:'Insertion of interbody biomechanical device (cage/spacer) with integral instrumentation, each interspace (add-on)',w:4.14,ao:1},
+  22854:{d:'Insertion of interbody biomechanical device, each additional interspace (add-on to 22853)',w:5.36,ao:1},
+  22830:{d:'Exploration of spinal fusion, no new fusion',w:10.94},
+  22595:{d:'Posterior fusion C1-C2',w:20.12},
+  22590:{d:'Craniocervical fusion occiput to C2',w:21.22},
+  22600:{d:'Posterior cervical fusion, single interspace',w:16.97},
+  22614:{d:'Each additional interspace posterior fusion (add-on)',w:6.27,ao:1},
+  63001:{d:'Cervical laminectomy 1-2 segments',w:17.17},
+  63020:{d:'Cervical laminotomy/foraminotomy single interspace',w:14.54},
+  // 63022 not in CMS 2026 PFS
+  63050:{d:'Cervical laminoplasty 2+ segments',w:21.46},
+  63051:{d:'Laminoplasty with posterior bony reconstruction (add-on)',w:24.87,ao:1},
+  22326:{d:'Open treatment cervical vertebral fracture posterior',w:20.32},
+  22328:{d:'Each additional fractured vertebra (add-on)',w:4.49,ao:1},
+  22840:{d:'Posterior non-segmental instrumentation (add-on)',w:12.21,ao:1},
+  22842:{d:'Posterior segmental instrumentation 3-6 segments (add-on)',w:12.25,ao:1},
+  22843:{d:'Posterior segmental instrumentation 7-12 segments (add-on)',w:13.10,ao:1},
+  22844:{d:'Posterior segmental instrumentation 13+ segments (add-on)',w:16.01,ao:1},
+  22558:{d:'Anterior lumbar interbody fusion ALIF/LLIF/XLIF/OLIF single interspace',w:22.94},
+  22585:{d:'Each additional interspace anterior lumbar interbody (add-on)',w:5.38,ao:1},
+  22586:{d:'Pre-sacral interbody L5-S1 AxiaLIF with instrumentation',w:27.42},
+  22846:{d:'Anterior instrumentation 4-7 segments (add-on)',w:12.09,ao:1},
+  22857:{d:'Lumbar total disc arthroplasty single level',w:26.45},
+  22862:{d:'Revision lumbar total disc arthroplasty',w:31.81},
+  22556:{d:'Anterior thoracic interbody fusion single interspace',w:24.08},
+  63087:{d:'Vertebral corpectomy anterior thoracic single segment',w:36.59},
+  63088:{d:'Each additional segment thoracic corpectomy (add-on)',w:4.21,ao:1},
+  // 22851 removed from CMS 2026 PFS - cage after corpectomy now billed as 22853
+  63005:{d:'Lumbar laminectomy 1-2 segments',w:16.02},
+  63012:{d:'Lumbar laminectomy spondylolisthesis with CES',w:16.43},
+  63017:{d:'Lumbar laminectomy 3+ segments',w:16.90},
+  63046:{d:'Laminectomy with facetectomy and foraminotomy, thoracic, single segment',w:16.82,ao:0},
+  63047:{d:'Laminectomy with facetectomy and foraminotomy, lumbar, single segment',w:14.99,ao:0},
+  63045:{d:'Laminectomy with facetectomy and foraminotomy, cervical, single segment',w:17.5},
+  63048:{d:'Each additional segment thoracic laminectomy (add-on)',w:3.38,ao:1},
+  63030:{d:'Lumbar microdiscectomy/laminotomy single interspace',w:11.7},
+  63035:{d:'Each additional interspace microdiscectomy (add-on)',w:3.76,ao:1},
+  63042:{d:'Revision lumbar microdiscectomy',w:18.29},
+  63265:{d:'Laminectomy for extradural tumor thoracic',w:23.22},
+  63267:{d:'Laminectomy for extradural tumor lumbar',w:18.96},
+  22630:{d:'Posterior interbody fusion PLIF/TLIF single interspace',w:21.54},
+  22632:{d:'Each additional interspace posterior interbody fusion (add-on)',w:5.09,ao:1},
+  22633:{d:'Combined posterior interbody + posterolateral fusion single interspace',w:26.13},
+  22634:{d:'Each additional interspace combined fusion (add-on)',w:7.76,ao:1},
+  22610:{d:'Posterolateral fusion thoracic single interspace',w:16.85},
+  22612:{d:'Posterolateral fusion lumbar single interspace',w:22.94},
+  22210:{d:'Osteotomy posterior cervical single vertebra',w:24.75},
+  22212:{d:'Osteotomy posterior thoracic single vertebra',w:20.47},
+  22214:{d:'Osteotomy posterior lumbar PSO single vertebra',w:20.49},
+  22216:{d:'Each additional vertebra osteotomy (add-on)',w:5.88,ao:1},
+  61783:{d:'Stereotactic spinal navigation (add-on)',w:3.66,ao:1},
+  20930:{d:'Allograft morselized bone chips (add-on) — $0 Medicare wRVU; submit to commercial payers',w:0.00,ao:1},
+  20931:{d:'Allograft structural cortical ring/dowel (add-on)',w:1.76,ao:1},
+  20936:{d:'Autograft local same incision (add-on) — $0 Medicare wRVU; submit to commercial payers',w:0.00,ao:1},
+  20937:{d:'Autograft morselized separate incision ICBG (add-on)',w:2.72,ao:1},
+  20938:{d:'Autograft structural separate incision ICBG (add-on)',w:2.94,ao:1},
+  20939:{d:'Bone marrow aspiration separate incision (add-on)',w:1.13,ao:1},
+  27279:{d:'Arthrodesis SI joint MIS lateral transfixing implant',w:11.83},
+  27280:{d:'Arthrodesis SI joint open posterior approach',w:19.5},
+};
+
+var GRAFTS = [
+  {id:'g1',label:'Structural allograft — cortical ring/dowel (+20931)',codes:['20931']},
+  {id:'g2',label:'Morselized allograft — bone chips (+20930, $0 Medicare / may pay commercial)',codes:['20930']},
+  {id:'g3',label:'Local autograft same incision (+20936, $0 Medicare / may pay commercial)',codes:['20936']},
+  {id:'g4',label:'Iliac crest morselized autograft separate incision (+20937)',codes:['20937']},
+  {id:'g5',label:'Iliac crest structural autograft separate incision (+20938)',codes:['20938']},
+  {id:'g6',label:'Bone marrow aspiration separate needle site (+20939)',codes:['20939']},
+  {id:'g0',label:'No bone graft / graft integral to implant',codes:[]},
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+var S = newState();
+function newState(){
+  return {step:'cat', cat:'', codes:[], warns:[], hist:[], gsel:[], graftNext:''};
+}
+
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+// Save snapshot BEFORE making changes
+function save(){ S.hist.push(clone(S)); }
+
+// Back: restore previous snapshot
+function back(){
+  if(!S.hist.length) return;
+  S = S.hist.pop();
+  draw();
+}
+
+function addC(id){ S.codes.push(''+id); }
+function addN(id,n){ for(var i=0;i<n;i++) S.codes.push(''+id); }
+function remC(id){ var i=S.codes.indexOf(''+id); if(i>=0) S.codes.splice(i,1); }
+function warn(m){ if(!S.warns.includes(m)) S.warns.push(m); }
+
+// go: save then change step, no code changes
+function go(id){ save(); S.step=id; draw(); }
+
+// doC: save, optionally add code(s), change step
+function doC(codeOrNull, next){
+  save();
+  if(codeOrNull){
+    var arr = Array.isArray(codeOrNull) ? codeOrNull : [codeOrNull];
+    arr.forEach(function(c){ addC(c); });
+  }
+  S.step = next;
+  draw();
+}
+
+// doN: save, add code n times, change step
+function doN(id, n, next){ save(); addN(id,n); S.step=next; draw(); }
+
+// Graft: save, set step to 'graft', store next destination
+function goGraft(next){ save(); S.graftNext=next; S.step='graft'; S.gsel=[]; draw(); }
+
+// Toggle graft button — NO re-render, just toggle class on the button
+function toggleG(id){
+  var btn = document.getElementById('gbtn_'+id);
+  var i = S.gsel.indexOf(id);
+  if(i >= 0){ S.gsel.splice(i,1); if(btn) btn.classList.remove('on'); }
+  else       { S.gsel.push(id);   if(btn) btn.classList.add('on');    }
+}
+
+// Confirm graft selection — save before committing
+function confirmG(){
+  save();
+  if(!S.gsel.length) warn('No graft selected — if no graft was used, no graft code is needed.');
+  S.gsel.forEach(function(sid){
+    var o = GRAFTS.find(function(x){ return x.id===sid; });
+    if(o) o.codes.forEach(function(c){ addC(c); });
+  });
+  S.gsel = [];
+  S.step = S.graftNext;
+  draw();
+}
+
+function totalW(){ return S.codes.reduce(function(a,id){ return a+((DB[id]||{}).w||0); }, 0); }
+
+// ── Rendering ──────────────────────────────────────────────────────────────
+function draw(){ document.getElementById('root').innerHTML = render(); }
+
+var CAT_NAMES = {ac:'Anterior cervical',pc:'Posterior cervical',al:'Anterior or lateral lumbar',
+  at:'Anterior thoracic',pd:'Posterior TL decompression',pf:'Posterior TL fusion',si:'SI joint fusion'};
+
+function backBtn(){
+  // Show back button whenever there is history to go back to
+  return S.hist.length > 0 ? '<button class="back" onclick="back()">&#8592; Back</button>' : '';
+}
+
+function progLine(){
+  return S.cat ? '<p class="prog">Category: '+CAT_NAMES[S.cat]+'</p>' : '';
+}
+
+function render(){
+  if(S.step === 'cat')   return renderCat();
+  if(S.step === 'graft') return renderGraft();
+  if(S.step === 'done')  return renderDone();
+  var fn = STEPS[S.step];
+  if(!fn) return '<p style="color:red">Unknown step: '+S.step+'</p>';
+  return backBtn() + progLine() + fn() + miniPanel();
+}
+
+function miniPanel(){
+  if(!S.codes.length && !S.warns.length) return '';
+  var rows = S.codes.map(function(id){
+    var c=DB[id]||{}, w=c.w||0;
+    return '<div class="row"><span class="cpt">'+(c.ao?'+':'')+id+'</span>'
+          +'<span class="desc">'+(c.d||id)+'</span>'
+          +'<span class="wrvu">'+w.toFixed(2)+' wRVU</span></div>';
+  }).join('');
+  var ws = S.warns.map(function(w){ return '<div class="warn">'+w+'</div>'; }).join('');
+  return (rows ? '<div class="panel"><h3>Codes so far</h3>'+rows+'</div>' : '') + ws;
+}
+
+function renderCat(){
+  var cats = [
+    {id:'ac',label:'Anterior cervical',sub:'ACDF, disc replacement, adjacent level, revision'},
+    {id:'pc',label:'Posterior cervical',sub:'Laminoplasty, fusion, foraminotomy, upper cervical, ORIF'},
+    {id:'al',label:'Anterior or lateral lumbar',sub:'ALIF, LLIF/XLIF/OLIF, disc replacement'},
+    {id:'at',label:'Anterior thoracic',sub:'Thoracic interbody, corpectomy, tumor/fracture'},
+    {id:'pd',label:'Posterior TL decompression',sub:'Laminectomy, microdiscectomy, laminotomy, tumor'},
+    {id:'pf',label:'Posterior TL fusion',sub:'PLIF/TLIF, deformity/osteotomy, revision, pelvic fixation'},
+    {id:'si',label:'SI joint fusion',sub:'MIS lateral, posterior approach, open, revision, injection'},
+  ];
+  var btns = cats.map(function(c){
+    return '<button class="btn" onclick="selCat(\''+c.id+'\')"><div style="font-weight:600;margin-bottom:2px">'+c.label+'</div>'
+          +'<div style="font-size:12px;color:#888">'+c.sub+'</div></button>';
+  }).join('');
+  return '<p class="qlabel">What surgery was performed?</p><div class="cat-grid">'+btns+'</div>';
+}
+
+function selCat(id){
+  save();
+  S.cat=id; S.codes=[]; S.warns=[]; S.gsel=[];
+  var first={ac:'ac1',pc:'pc1',al:'al1',at:'at1',pd:'pd1',pf:'pf1',si:'si1'};
+  S.step = first[id];
+  draw();
+}
+
+function renderGraft(){
+  var btns = GRAFTS.map(function(o){
+    return '<button class="btn" id="gbtn_'+o.id+'" onclick="toggleG(\''+o.id+'\')">'+o.label+'</button>';
+  }).join('');
+  return backBtn() + progLine()
+    + '<p class="qlabel">What bone graft was used?</p>'
+    + '<p class="qhint">Select all that apply, then press confirm.</p>'
+    + '<div class="grid">'+btns+'</div>'
+    + '<button class="cbtn" onclick="confirmG()">Confirm selection &#8594;</button>'
+    + miniPanel();
+}
+
+function renderDone(){
+  var rows=S.codes.map(function(id){
+    var c=DB[id]||{},w=c.w||0;
+    return '<div class="row"><span class="cpt">'+(c.ao?'+':'')+id+'</span>'
+          +'<span class="desc">'+(c.d||id)+'</span>'
+          +'<span class="wrvu">'+w.toFixed(2)+' wRVU / $'+Math.round(w*CF).toLocaleString()+'</span></div>';
+  }).join('');
+  var ws=S.warns.map(function(w){return '<div class="warn">'+w+'</div>';}).join('');
+  var tw=totalW();
+  var seen={};var tips=[];
+  S.codes.forEach(function(id){
+    if(OP_NOTES[id]&&!seen[id]){seen[id]=1;tips.push({id:id,tip:OP_NOTES[id]});}
+  });
+  var tipHtml='';
+  if(tips.length>0){
+    var tipRows=tips.map(function(t){
+      return '<div style="padding:9px 0;border-bottom:1px solid #eee">'
+        +'<div style="font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:3px">'+t.id+'</div>'
+        +'<div style="font-size:12px;color:#444;line-height:1.65">'+t.tip+'</div>'
+        +'</div>';
+    }).join('');
+    tipHtml='<div class="panel" style="margin-top:1rem">'
+      +'<h3>Operative note documentation tips</h3>'
+      +'<p style="font-size:11px;color:#888;margin-bottom:8px">Key elements to document for each billed code</p>'
+      +tipRows+'</div>';
+  }
+  return backBtn()
+    +'<h1 style="margin-bottom:1rem">Case complete</h1>'
+    +'<div class="panel"><h3>Billable code list</h3>'+(rows||'<p style="font-size:13px;color:#888">No codes selected.</p>')+'</div>'
+    +ws
+    +'<div class="tbar"><span class="tlabel">Total wRVUs</span><span class="tval">'+tw.toFixed(2)+'</span></div>'
+    +'<div class="tbar"><span class="tlabel">Estimated Medicare physician payment (non-QPP $33.40/wRVU)</span><span class="tval">$'+Math.round(tw*CF).toLocaleString()+'</span></div>'
+    +tipHtml
+    +'<button class="restart" onclick="restart()" style="margin-top:1rem">Start new case</button>'
+    +'<p class="note">2026 CMS PFS non-QPP CF $33.40. Physician facility rate shown. Add-on codes marked +. 0775T is Category III with variable payer coverage. Verify all codes with CMS PFS Lookup Tool for your MAC. Not billing or legal advice.</p>';
+}
+function restart(){ S = newState(); draw(); }
+
+// ── Question builder ────────────────────────────────────────────────────────
+// Uses setTimeout to attach event listeners after innerHTML is set
+function q(label, opts, hint){
+  var h = hint ? '<p class="qhint">'+hint+'</p>' : '';
+  var btns = opts.map(function(o,i){
+    return '<button class="btn" data-qi="'+i+'">'+o.label+'</button>';
+  }).join('');
+  // Attach listeners after render
+  setTimeout(function(){
+    var wrap = document.getElementById('qwrap');
+    if(!wrap) return;
+    wrap.querySelectorAll('[data-qi]').forEach(function(b){
+      b.addEventListener('click', function(){
+        opts[parseInt(b.getAttribute('data-qi'))].fn();
+      });
+    });
+  }, 0);
+  return '<p class="qlabel">'+label+'</p>'+h+'<div class="grid" id="qwrap">'+btns+'</div>';
+}
+
+var STEPS = {};
+function step(id, fn){ STEPS[id] = fn; }
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANTERIOR CERVICAL
+// ══════════════════════════════════════════════════════════════════════════
+step('ac1', function(){ return q('What was the primary anterior cervical procedure?',[
+  {label:'ACDF with full discectomy and decompression (22551)', fn:function(){ doC('22551','ac_levels'); }},
+  {label:'ACDF with minimal discectomy only (22554)',           fn:function(){ doC('22554','ac_levels'); }},
+  {label:'Cervical disc arthroplasty (22856)',                  fn:function(){ doC('22856','ac_cda');   }},
+  {label:'Revision of prior disc arthroplasty (22861)',         fn:function(){ doC('22861','ac_inst');  }},
+  {label:'Adjacent level ACDF — prior hardware in place',       fn:function(){ go('ac_adj');            }},
+  {label:'Hardware removal or reinsertion only',                fn:function(){ go('ac_hw');             }},
+]); });
+
+step('ac_levels', function(){ return q('How many interspaces were fused anteriorly?',[
+  {label:'1 level',             fn:function(){ go('ac_device');            }},
+  {label:'2 levels (+22552)',   fn:function(){ doN('22552',1,'ac_device'); }},
+  {label:'3 levels (+22552 x2)',fn:function(){ doN('22552',2,'ac_device'); }},
+  {label:'4 levels (+22552 x3)',fn:function(){ doN('22552',3,'ac_inst');   }},
+]); });
+
+
+step('ac_device', function(){ return q('Was a cage, spacer, or interbody biomechanical device placed in the disc space?',[
+  {label:'Yes — single interspace (+22853)',           fn:function(){ doC('22853','ac_inst'); }},
+  {label:'Yes — 2 interspaces (+22853 +22854)',        fn:function(){ save(); addC('22853'); addC('22854'); S.step='ac_inst'; draw(); }},
+  {label:'Yes — 3 interspaces (+22853 +22854 x2)',     fn:function(){ save(); addC('22853'); addN('22854',2); S.step='ac_inst'; draw(); }},
+  {label:'Yes — 4 interspaces (+22853 +22854 x3)',     fn:function(){ save(); addC('22853'); addN('22854',3); S.step='ac_inst'; draw(); }},
+  {label:'No device — autograft / allograft structural only (no cage)', fn:function(){ go('ac_inst'); }},
+],'CPT +22853 covers any interbody biomechanical device (PEEK cage, titanium cage, allograft spacer with integral fixation) placed in the disc space. Do not report +22853 with 22554 (minimal discectomy) unless a true structural device was placed. Structural allograft alone without integral fixation = +20931, not +22853.'); });
+
+step('al_device', function(){ return q('Was a cage, spacer, or interbody biomechanical device placed in the disc space?',[
+  {label:'Yes — single interspace (+22853)',           fn:function(){ doC('22853','al_inst_a'); }},
+  {label:'Yes — 2 interspaces (+22853 +22854)',        fn:function(){ save(); addC('22853'); addC('22854'); S.step='al_inst_a'; draw(); }},
+  {label:'Yes — 3 interspaces (+22853 +22854 x2)',     fn:function(){ save(); addC('22853'); addN('22854',2); S.step='al_inst_a'; draw(); }},
+  {label:'No device — structural graft only (use +20931 for structural allograft)', fn:function(){ go('al_inst_a'); }},
+],'ALIF, LLIF, XLIF, and OLIF cage/spacer devices = +22853 per interspace. AxiaLIF (22586) includes the device — do not add +22853 to 22586.'); });
+
+step('pf_device', function(){ return q('Was a cage, spacer, or interbody biomechanical device placed in the disc space(s)?',[
+  {label:'Yes — single interspace (+22853)',           fn:function(){ doC('22853','pf_inst'); }},
+  {label:'Yes — 2 interspaces (+22853 +22854)',        fn:function(){ save(); addC('22853'); addC('22854'); S.step='pf_inst'; draw(); }},
+  {label:'Yes — 3 interspaces (+22853 +22854 x2)',     fn:function(){ save(); addC('22853'); addN('22854',2); S.step='pf_inst'; draw(); }},
+  {label:'No device placed',                           fn:function(){ go('pf_inst'); }},
+],'PLIF and TLIF cages = +22853 per interspace. The laminectomy/discectomy inherent to PLIF/TLIF approach is bundled into 22630/22633 — the cage itself is separately captured by +22853. +22853 is NOT bundled with 22630 or 22633 under NCCI.'); });
+
+step('ac_inst', function(){ return q('Was anterior instrumentation (cervical plate) applied?',[
+  {label:'Yes — plate applied (+22845)', fn:function(){ save(); addC('22845'); goGraft('ac_nav'); }},
+  {label:'No plate',                     fn:function(){ goGraft('ac_nav'); }},
+]); });
+
+// Dedicated step that just launches graft multi-select
+// ac_graft_q removed — goGraft called directly
+
+step('ac_nav', function(){ return q('Was stereotactic navigation used (not fluoroscopy)?',[
+  {label:'Yes (+61783)', fn:function(){ doC('61783','done'); }},
+  {label:'No',           fn:function(){ go('done');          }},
+]); });
+
+step('ac_cda', function(){ return q('Was a second level also treated with arthroplasty?',[
+  {label:'No — single level',        fn:function(){ go('ac_inst');            }},
+  {label:'Yes — two-level (+22858)', fn:function(){ doC('22858','ac_inst');   }},
+]); });
+
+step('ac_adj', function(){ return q('New level adjacent to prior fusion, or redo at same level?',[
+  {label:'New level adjacent to prior fusion', fn:function(){ go('ac_adj_hw');  }},
+  {label:'Redo / revision at prior level',     fn:function(){ go('ac_adj_rev'); }},
+]); });
+
+step('ac_adj_hw', function(){ return q('Does the prior plate need to be removed to access the new level?',[
+  {label:'Yes — prior plate removal required (22852)', fn:function(){ doC('22852','ac_adj_primary'); }},
+  {label:'No — new level accessible without removal',  fn:function(){ go('ac_adj_primary');          }},
+]); });
+
+step('ac_adj_primary', function(){ return q('What procedure at the new adjacent level?',[
+  {label:'Full ACDF with discectomy (22551)',fn:function(){ doC('22551','ac_adj_levels'); }},
+  {label:'Minimal discectomy ACDF (22554)', fn:function(){ doC('22554','ac_adj_levels'); }},
+  {label:'Disc arthroplasty (22856)',        fn:function(){ doC('22856','ac_inst');       }},
+]); });
+
+step('ac_adj_levels', function(){ return q('How many total new interspaces fused this session?',[
+  {label:'1 new level',              fn:function(){ go('ac_inst');              }},
+  {label:'2 new levels (+22552)',    fn:function(){ doN('22552',1,'ac_inst');   }},
+  {label:'3 new levels (+22552 x2)', fn:function(){ doN('22552',2,'ac_inst');  }},
+]); });
+
+step('ac_adj_rev', function(){ return q('What was performed at the prior level?',[
+  {label:'Hardware removal + redo fusion (22852 + 22551)', fn:function(){ save(); addC('22852'); addC('22551'); S.step='ac_adj_rev2'; draw(); }},
+  {label:'Exploration only — no new fusion (22830)',       fn:function(){ doC('22830','done'); }},
+]); });
+
+step('ac_adj_rev2', function(){ return q('Were additional new levels also addressed?',[
+  {label:'No — redo at single level only',     fn:function(){ go('ac_inst');             }},
+  {label:'+1 additional level (+22552)',       fn:function(){ doN('22552',1,'ac_inst');  }},
+  {label:'+2 additional levels (+22552 x2)',   fn:function(){ doN('22552',2,'ac_inst');  }},
+]); });
+
+step('ac_hw', function(){ return q('What hardware procedure?',[
+  {label:'Removal of anterior plate (22852)',              fn:function(){ doC('22852','done'); }},
+  {label:'Reinsertion of fixation device (22849)',         fn:function(){ doC('22849','done'); }},
+  {label:'Both removal and reinsertion',                   fn:function(){ save(); addC('22852'); addC('22849'); S.step='done'; draw(); }},
+]); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// POSTERIOR CERVICAL
+// ══════════════════════════════════════════════════════════════════════════
+step('pc1', function(){ return q('What was the primary posterior cervical procedure?',[
+  {label:'Posterior cervical fusion (with or without laminectomy)', fn:function(){ go('pc_level');             }},
+  {label:'Laminoplasty (open-door or French-door)',                 fn:function(){ doC('63050','pc_laplas');   }},
+  {label:'Laminectomy only (no fusion)',                            fn:function(){ go('pc_lam');               }},
+  {label:'Laminotomy / foraminotomy (hemilaminectomy)',             fn:function(){ doC('63020','pc_foram');    }},
+  {label:'Upper cervical / occipitocervical (C0-C1-C2)',            fn:function(){ go('pc_upper');             }},
+  {label:'ORIF — cervical fracture / dislocation',                  fn:function(){ doC('22326','pc_orif');     }},
+]); });
+
+step('pc_level', function(){ return q('What level(s) were fused?',[
+  {label:'Sub-axial cervical C2 and below (22600)', fn:function(){ doC('22600','pc_levels'); }},
+  {label:'C1-C2 only (22595)',                       fn:function(){ doC('22595','pc_inst_c'); }},
+  {label:'Occiput to C2 (22590)',                    fn:function(){ doC('22590','pc_inst_c'); }},
+]); });
+
+step('pc_levels', function(){ return q('How many interspaces were fused?',[
+  {label:'1',              fn:function(){ go('pc_decomp');              }},
+  {label:'2 (+22614)',     fn:function(){ doN('22614',1,'pc_decomp');   }},
+  {label:'3 (+22614 x2)', fn:function(){ doN('22614',2,'pc_decomp');   }},
+  {label:'4 (+22614 x3)', fn:function(){ doN('22614',3,'pc_decomp');   }},
+  {label:'5+ (+22614 x4)',fn:function(){ doN('22614',4,'pc_decomp');   }},
+]); });
+
+step('pc_decomp', function(){ return q('Was a laminectomy performed at a separate level from the fusion?',[
+  {label:'Yes — distinct level (63001)', fn:function(){ doC('63001','pc_inst_c'); }},
+  {label:'No',                           fn:function(){ go('pc_inst_c');          }},
+]); });
+
+step('pc_inst_c', function(){ return q('How many vertebral segments does the posterior construct span?',[
+  {label:'1 interspace non-segmental (+22840)', fn:function(){ save(); addC('22840'); goGraft('done'); }},
+  {label:'3-6 segments (+22842)',               fn:function(){ save(); addC('22842'); goGraft('done'); }},
+  {label:'7-12 segments (+22843)',              fn:function(){ save(); addC('22843'); goGraft('done'); }},
+  {label:'13+ segments (+22844)',               fn:function(){ save(); addC('22844'); goGraft('done'); }},
+  {label:'No instrumentation',                  fn:function(){ goGraft('done'); }},
+]); });
+
+// pc_graft_q removed — goGraft called directly
+
+step('pc_laplas', function(){ return q('Was laminoplasty performed with implant reconstruction of the posterior arch?',[
+  {label:'Yes (+63051)', fn:function(){ doC('63051','done'); }},
+  {label:'No',           fn:function(){ go('done');          }},
+]); });
+
+step('pc_lam', function(){ return q('Type of cervical laminectomy?',[
+  {label:'1-2 segments (63001)', fn:function(){ doC('63001','done'); }},
+  {label:'3+ segments (63001)',  fn:function(){ doC('63001','done'); }},
+]); });
+
+step('pc_foram', function(){ return q('Were additional interspaces treated?',[
+  {label:'1 level only',         fn:function(){ go('done');               }},
+  {label:'2 levels — document bilateral or separate-level decompression in operative note', fn:function(){ go('done'); }},
+  {label:'3 levels', fn:function(){ go('done'); }},
+]); });
+
+step('pc_upper', function(){ return q('What upper cervical construct?',[
+  {label:'C1-C2 (22595)',                    fn:function(){ doC('22595','pc_inst_c'); }},
+  {label:'Occipitocervical occiput to C2+ (22590)', fn:function(){ doC('22590','pc_inst_c'); }},
+]); });
+
+step('pc_orif', function(){ return q('Were additional fractured vertebrae treated?',[
+  {label:'No — single vertebra',             fn:function(){ go('pc_orif_lam');              }},
+  {label:'+1 additional (+22328)',           fn:function(){ doC('22328','pc_orif_lam');     }},
+  {label:'+2 additional (+22328 x2)',        fn:function(){ doN('22328',2,'pc_orif_lam');   }},
+]); });
+
+step('pc_orif_lam', function(){ return q('Was a cervical laminectomy also performed?',[
+  {label:'No laminectomy',              fn:function(){ go('pc_orif_fus');           }},
+  {label:'Yes — 1-2 segments (63001)', fn:function(){ doC('63001','pc_orif_fus');  }},
+  {label:'Yes — 3+ segments (63001)',  fn:function(){ doC('63001','pc_orif_fus');  }},
+]); });
+
+step('pc_orif_fus', function(){ return q('Was an instrumented posterior fusion also performed?',[
+  {label:'No — ORIF only',                       fn:function(){ go('pc_orif_inst'); }},
+  {label:'Yes — 1 interspace (22600)',            fn:function(){ doC('22600','pc_orif_inst'); }},
+  {label:'Yes — 2 interspaces (22600+22614)',     fn:function(){ save(); addC('22600'); addC('22614'); S.step='pc_orif_inst'; draw(); }},
+  {label:'Yes — 3+ interspaces',                 fn:function(){ save(); addC('22600'); addN('22614',2); S.step='pc_orif_inst'; draw(); }},
+]); });
+
+step('pc_orif_inst', function(){ return q('How many vertebral segments does the construct span?',[
+  {label:'Non-segmental (+22840)',fn:function(){ save(); addC('22840'); goGraft('done'); }},
+  {label:'3-6 segments (+22842)',fn:function(){ save(); addC('22842'); goGraft('done'); }},
+  {label:'7-12 segments (+22843)',fn:function(){ save(); addC('22843'); goGraft('done'); }},
+  {label:'No instrumentation',   fn:function(){ goGraft('done'); }},
+]); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANTERIOR LUMBAR
+// ══════════════════════════════════════════════════════════════════════════
+step('al1', function(){ return q('What was the primary anterior or lateral lumbar procedure?',[
+  {label:'ALIF (22558)',                     fn:function(){ doC('22558','al_levels'); }},
+  {label:'Lateral / prone lateral — LLIF/XLIF/OLIF/PTP (22558)', fn:function(){ doC('22558','al_levels'); }},
+  {label:'AxiaLIF pre-sacral L5-S1 (22586)',fn:function(){ save(); addC('22586'); goGraft('done'); }},
+  {label:'Lumbar total disc arthroplasty (22857)',fn:function(){ doC('22857','al_disc'); }},
+  {label:'Revision lumbar disc arthroplasty (22862)',fn:function(){ save(); addC('22862'); goGraft('done'); }},
+]); });
+
+step('al_levels', function(){ return q('How many interspaces?',[
+  {label:'1',              fn:function(){ go('al_device');               }},
+  {label:'2 (+22585)',     fn:function(){ doN('22585',1,'al_device');   }},
+  {label:'3 (+22585 x2)', fn:function(){ doN('22585',2,'al_device');   }},
+],'Add-on codes (+22585, +22853, +22854, +22845, +22846, and all graft codes) must NEVER receive Modifier 51. These are add-on codes by definition. Modifier 51 (multiple procedures) applies only when 22558 is billed alongside a separate standalone procedure in the same session — for example, 22558 with 22612 (posterolateral fusion). In that case, the lower-wRVU standalone code receives Mod 51 and is subject to the 50% multiple procedure reduction.'); });
+
+step('al_inst_a', function(){ return q('Was anterior instrumentation applied?',[
+  {label:'Yes 2-3 segments (+22845)', fn:function(){ doC('22845','al_approach'); }},
+  {label:'Yes 4-7 segments (+22846)', fn:function(){ doC('22846','al_approach'); }},
+  {label:'No',                        fn:function(){ go('al_approach');           }},
+]); });
+
+step('al_approach', function(){ return q('Was a separate approach/access surgeon involved?',[
+  {label:'Yes — Mod 62 applies', fn:function(){ save(); warn('Apply Mod 62 to 22558 — both surgeons bill 22558 Mod 62 at 62.5% each.'); goGraft('done'); }},
+  {label:'No',                   fn:function(){ goGraft('done'); }},
+]); });
+
+// al_graft_q removed — goGraft called directly
+
+step('al_disc', function(){ return q('Medicare or commercial payer?',[
+  {label:'Medicare',   fn:function(){ save(); warn('Medicare coverage for lumbar TDA (22857) is limited — prior auth with strict criteria required.'); goGraft('done'); }},
+  {label:'Commercial', fn:function(){ save(); warn('Prior auth for lumbar TDA required. Document: single level L3-S1, failed conservative care, preserved disc height, no significant facet arthropathy.'); goGraft('done'); }},
+]); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// ANTERIOR THORACIC
+// ══════════════════════════════════════════════════════════════════════════
+step('at1', function(){ return q('What was the primary anterior thoracic procedure?',[
+  {label:'Thoracic interbody fusion (22556)', fn:function(){ doC('22556','at_levels'); }},
+  {label:'Vertebral corpectomy (63087)',       fn:function(){ doC('63087','at_corp');   }},
+]); });
+
+step('at_levels', function(){ return q('How many interspaces?',[
+  {label:'1',              fn:function(){ go('at_approach');              }},
+  {label:'2 (+22585)',     fn:function(){ doC('22585','at_approach');     }},
+  {label:'3 (+22585 x2)', fn:function(){ doN('22585',2,'at_approach');   }},
+]); });
+
+step('at_corp', function(){ return q('How many vertebral segments resected?',[
+  {label:'1',              fn:function(){ go('at_cage');              }},
+  {label:'2 (+63088)',     fn:function(){ doC('63088','at_cage');     }},
+  {label:'3 (+63088 x2)', fn:function(){ doN('63088',2,'at_cage');   }},
+]); });
+
+step('at_cage', function(){ return q('Was a cage or expandable mesh placed?',[
+  {label:'Yes — cage/spacer placed (+22853)', fn:function(){ doC('22853','at_approach'); }},
+  {label:'No',           fn:function(){ go('at_approach');           }},
+]); });
+
+step('at_approach', function(){ return q('Was a separate thoracic surgeon involved in the approach?',[
+  {label:'Yes — Mod 62', fn:function(){ save(); warn('Apply Mod 62 — approach surgeon bills thoracotomy/VATS codes separately.'); goGraft('done'); }},
+  {label:'No',           fn:function(){ goGraft('done'); }},
+]); });
+
+// at_graft_q removed — goGraft called directly
+
+// ══════════════════════════════════════════════════════════════════════════
+// POSTERIOR TL DECOMPRESSION
+// ══════════════════════════════════════════════════════════════════════════
+step('pd1', function(){ return q('What was the primary decompression procedure?',[
+  {label:'Lumbar laminectomy (complete lamina removal)',   fn:function(){ go('pd_lam');              }},
+  {label:'Lumbar microdiscectomy / laminotomy (partial)', fn:function(){ go('pd_micro');             }},
+  {label:'Thoracic laminectomy without facetectomy/foraminotomy (63045)',fn:function(){ doC('63045','pd_thor'); }},
+  {label:'Thoracic laminectomy WITH facetectomy and foraminotomy (63046)',fn:function(){ doC('63046','pd_thor'); }},
+  {label:'Extradural tumor removal — posterior approach', fn:function(){ go('pd_tumor');             }},
+]); });
+
+step('pd_lam', function(){ return q('What type of lumbar laminectomy?',[
+  {label:'Laminectomy 1-2 segments without facetectomy/foraminotomy (63005)',fn:function(){ doC('63005','pd_done'); }},
+  {label:'Laminectomy 3+ segments without facetectomy/foraminotomy (63017)',fn:function(){ doC('63017','pd_done'); }},
+  {label:'Laminectomy WITH facetectomy and foraminotomy — 1 lumbar segment (63047)',fn:function(){ doC('63047','pd_lam47'); }},
+  {label:'Spondylolisthesis with cauda equina syndrome (63012)',fn:function(){ doC('63012','pd_done'); }},
+],'63047 = laminectomy with facetectomy AND foraminotomy at the same lumbar segment. Use 63047 instead of 63005 when both a medial facetectomy and foraminotomy are performed. +63048 for each additional segment (whether 63045/63046/63047 was the primary).'); });
+
+step('pd_lam47', function(){ return q('Were additional segments also treated with laminectomy + facetectomy + foraminotomy?',[
+  {label:'No — single segment only (63047)',fn:function(){ go('pd_done'); }},
+  {label:'+1 additional segment (+63048)',fn:function(){ doC('63048','pd_done'); }},
+  {label:'+2 additional segments (+63048 x2)',fn:function(){ doN('63048',2,'pd_done'); }},
+  {label:'+3 additional segments (+63048 x3)',fn:function(){ doN('63048',3,'pd_done'); }},
+]); });
+
+step('pd_micro', function(){ return q('Primary or revision microdiscectomy?',[
+  {label:'Primary (63030)',        fn:function(){ doC('63030','pd_micro2'); }},
+  {label:'Revision / redo (63042)',fn:function(){ doC('63042','pd_done');   }},
+]); });
+
+step('pd_micro2', function(){ return q('How many interspaces?',[
+  {label:'1',              fn:function(){ go('pd_annular');              }},
+  {label:'2 (+63035)',     fn:function(){ doC('63035','pd_annular');     }},
+  {label:'3 (+63035 x2)', fn:function(){ doN('63035',2,'pd_annular');   }},
+]); });
+
+step('pd_annular', function(){ return q('Was an annular repair device placed? (New 2026 +63032)',[
+  {label:'Yes (+63032)', fn:function(){ save(); warn('+63032 new 2026 code — verify LCD coverage with your MAC. Mutually exclusive with 63042.'); S.step='pd_done'; draw(); }},
+  {label:'No',           fn:function(){ go('pd_done'); }},
+]); });
+
+step('pd_thor', function(){ return q('How many thoracic segments decompressed?',[
+  {label:'1',              fn:function(){ go('pd_done');              }},
+  {label:'2 (+63048)',     fn:function(){ doC('63048','pd_done');     }},
+  {label:'3+ (+63048 x2)',fn:function(){ doN('63048',2,'pd_done');   }},
+]); });
+
+
+
+step('pd_tumor', function(){ return q('Tumor level and compartment?',[
+  {label:'Extradural thoracic (63265)', fn:function(){ doC('63265','pd_done'); }},
+  {label:'Extradural lumbar (63267)',   fn:function(){ doC('63267','pd_done'); }},
+  {label:'Intradural (63275-63278 — not in this tool)', fn:function(){ save(); warn('Intradural tumor codes 63275-63278 not included. Review with your billing team.'); S.step='pd_done'; draw(); }},
+]); });
+
+step('pd_done', function(){ return q('Was a fusion or instrumentation also performed?',[
+  {label:'No — decompression only',                          fn:function(){ go('done'); }},
+  {label:'Yes — will address with Posterior TL Fusion interview', fn:function(){ save(); warn('When decompression and fusion are combined, laminectomy is bundled into PLIF/TLIF at the same level. Bill decompression separately only at distinct levels.'); S.step='done'; draw(); }},
+]); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// POSTERIOR TL FUSION
+// ══════════════════════════════════════════════════════════════════════════
+step('pf1', function(){ return q('What was the primary posterior fusion technique?',[
+  {label:'PLIF or TLIF — posterior interbody cage placed', fn:function(){ doC('22630','pf_360');    }},
+  {label:'Posterolateral fusion only — no interbody cage', fn:function(){ go('pf_postlat');         }},
+  {label:'Deformity correction with osteotomy (PSO/SPO)',  fn:function(){ go('pf_osteo');           }},
+  {label:'Revision / hardware exchange — no new fusion',   fn:function(){ go('pf_rev');             }},
+]); });
+
+step('pf_360', function(){ return q('Was a posterolateral fusion also performed at the same interspace — 360 degree?',[
+  {label:'Yes — 360 at primary level (use 22633 instead of 22630)', fn:function(){ save(); remC('22630'); addC('22633'); S.step='pf_extra'; draw(); }},
+  {label:'No — interbody only at primary level (22630)',             fn:function(){ go('pf_extra'); }},
+]); });
+
+step('pf_extra', function(){ return q('How many total interspaces had interbody fusion?',[
+  {label:'1 level',                       fn:function(){ go('pf_device'); }},
+  {label:'2 levels — was 2nd also 360?', fn:function(){ go('pf_extra2'); }},
+  {label:'3 levels',                      fn:function(){ go('pf_extra3'); }},
+]); });
+
+step('pf_extra2', function(){ return q('Was the second level also combined 360?',[
+  {label:'Yes (+22634)',            fn:function(){ doC('22634','pf_device'); }},
+  {label:'No — interbody only (+22632)',fn:function(){ doC('22632','pf_device'); }},
+]); });
+
+step('pf_extra3', function(){ return q('Were levels 2 and 3 also 360 degree fusions?',[
+  {label:'Both 360 (+22634 x2)',          fn:function(){ doN('22634',2,'pf_device'); }},
+  {label:'Both interbody only (+22632 x2)',fn:function(){ doN('22632',2,'pf_device'); }},
+  {label:'Mixed (+22634 and +22632)',      fn:function(){ save(); addC('22634'); addC('22632'); S.step='pf_device'; draw(); }},
+]); });
+
+step('pf_postlat', function(){ return q('What region?',[
+  {label:'Lumbar (22612)',               fn:function(){ doC('22612','pf_pl_levels'); }},
+  {label:'Thoracic (22610)',             fn:function(){ doC('22610','pf_pl_levels'); }},
+  {label:'Thoracolumbar — both regions', fn:function(){ save(); addC('22610'); addC('22612'); S.step='pf_pl_levels'; draw(); }},
+]); });
+
+step('pf_pl_levels', function(){ return q('Additional interspaces beyond the primary level?',[
+  {label:'Primary level only',      fn:function(){ go('pf_inst');              }},
+  {label:'+1 (+22614)',             fn:function(){ doC('22614','pf_inst');     }},
+  {label:'+2 (+22614 x2)',          fn:function(){ doN('22614',2,'pf_inst');   }},
+  {label:'+3 or more (+22614 x3)', fn:function(){ doN('22614',3,'pf_inst');   }},
+]); });
+
+step('pf_inst', function(){ return q('How many vertebral segments does the posterior construct span?',[
+  {label:'1 interspace non-segmental (+22840)', fn:function(){ doC('22840','pf_osteo_q'); }},
+  {label:'3-6 segments (+22842)',               fn:function(){ doC('22842','pf_osteo_q'); }},
+  {label:'7-12 segments (+22843)',              fn:function(){ doC('22843','pf_osteo_q'); }},
+  {label:'13+ segments (+22844)',               fn:function(){ doC('22844','pf_osteo_q'); }},
+  {label:'No posterior instrumentation',        fn:function(){ go('pf_osteo_q');          }},
+]); });
+
+step('pf_osteo_q', function(){ return q('Was an osteotomy performed?',[
+  {label:'Yes', fn:function(){ go('pf_osteo'); }},
+  {label:'No',  fn:function(){ go('pf_nav');   }},
+]); });
+
+step('pf_osteo', function(){ return q('What type and region of osteotomy?',[
+  {label:'Cervical PSO/SPO (22210)', fn:function(){ doC('22210','pf_osteo2'); }},
+  {label:'Thoracic PSO/SPO (22212)', fn:function(){ doC('22212','pf_osteo2'); }},
+  {label:'Lumbar PSO (22214)',        fn:function(){ doC('22214','pf_osteo2'); }},
+]); });
+
+step('pf_osteo2', function(){ return q('Additional vertebrae osteotomized?',[
+  {label:'No — single vertebra',       fn:function(){ go('pf_deform_rev');              }},
+  {label:'+1 additional (+22216)',     fn:function(){ doC('22216','pf_deform_rev');     }},
+  {label:'+2 additional (+22216 x2)', fn:function(){ doN('22216',2,'pf_deform_rev');   }},
+]); });
+
+step('pf_deform_rev', function(){ return q('Was this a revision deformity case with prior instrumentation in place?',[
+  {label:'No — primary case',                  fn:function(){ go('pf_deform_fusion'); }},
+  {label:'Yes — prior instrumentation present',fn:function(){ go('pf_deform_hwtype'); }},
+]); });
+
+step('pf_deform_hwtype', function(){ return q('What was done with the prior instrumentation?',[
+  {label:'Complete or partial removal of prior segmental instrumentation (22852)', fn:function(){ doC('22852','pf_deform_extend'); }},
+  {label:'Non-segmental / plate removal only (22852)',                             fn:function(){ doC('22852','pf_deform_extend'); }},
+  {label:'Prior hardware left in place — new construct added around it',           fn:function(){ save(); warn('If prior hardware left in place and new anchors added, bill only the new instrumentation add-on. Do not bill a removal code.'); S.step='pf_deform_extend'; draw(); }},
+]); });
+
+step('pf_deform_extend', function(){ return q('Was the fusion extended to new levels not previously fused?',[
+  {label:'No — same levels revised in place',     fn:function(){ go('pf_deform_cage'); }},
+  {label:'Yes — extended proximally or distally', fn:function(){ save(); warn('New levels use primary fusion codes (22612, 22630, 22633) for new interspaces plus +22614 per level. Instrumentation add-on reflects total construct span.'); S.step='pf_deform_cage'; draw(); }},
+]); });
+
+step('pf_deform_cage', function(){ return q('Was an interbody cage placed during the revision?',[
+  {label:'No interbody cage',           fn:function(){ go('pf_deform_pseudo'); }},
+  {label:'Yes — cage at one or more levels', fn:function(){ save(); warn('Add 22630 (interbody only) or 22633 (360 degree) for each interspace where a cage was placed, in addition to revision hardware codes.'); S.step='pf_deform_pseudo'; draw(); }},
+]); });
+
+step('pf_deform_pseudo', function(){ return q('Was pseudarthrosis identified and repaired?',[
+  {label:'No pseudarthrosis',            fn:function(){ go('pf_deform_fusion'); }},
+  {label:'Yes — pseudarthrosis repaired',fn:function(){ save(); warn('Document absence of trabecular bridging on imaging and at surgery. ICD-10: M96.0. Payers require imaging and symptom documentation.'); S.step='pf_deform_fusion'; draw(); }},
+]); });
+
+
+step('pf_deform_fusion', function(){ return q('Beyond the osteotomy level(s), were additional spinal interspaces fused in the same session?',[
+  {label:'No additional fusion — osteotomy and existing levels only', fn:function(){ go('pf_nav'); }},
+  {label:'Yes — posterolateral fusion at additional interspaces',     fn:function(){ go('pf_deform_fusion_levels'); }},
+  {label:'Yes — both posterolateral fusion AND interbody cages at additional levels', fn:function(){ go('pf_deform_fusion_ib'); }},
+]); });
+
+step('pf_deform_fusion_levels', function(){ return q('How many additional interspaces were fused posterolaterally (beyond osteotomy level)?',[
+  {label:'+1 interspace (+22614)',       fn:function(){ doC('22614','pf_deform_fusion_done'); }},
+  {label:'+2 interspaces (+22614 x2)',   fn:function(){ doN('22614',2,'pf_deform_fusion_done'); }},
+  {label:'+3 interspaces (+22614 x3)',   fn:function(){ doN('22614',3,'pf_deform_fusion_done'); }},
+  {label:'+4 or more (+22614 x4)',       fn:function(){ doN('22614',4,'pf_deform_fusion_done'); }},
+],'Add +22614 for each posterolateral fusion interspace beyond the primary osteotomy level. For long deformity constructs, also confirm instrumentation segment count was selected correctly at the earlier instrumentation question.'); });
+
+step('pf_deform_fusion_ib', function(){ return q('Were the additional levels fused with interbody cages (PLIF/TLIF) or posterolateral only?',[
+  {label:'Interbody cage at 1 additional level — 360 degree (22633 or 22630)',
+    fn:function(){ save(); warn('Add 22633 (if posterolateral also performed at that level) or 22630 (interbody only) for each additional interbody interspace. These are in addition to the osteotomy codes (22210/22212/22214) and instrumentation add-ons.'); S.step='pf_deform_fusion_ib2'; draw(); }},
+  {label:'Interbody cage at 2 additional levels',
+    fn:function(){ save(); warn('Add 22633/22630 for each additional interbody level plus +22634/+22632 add-ons. Review 360-degree vs interbody-only distinction at each level.'); S.step='pf_deform_fusion_ib2'; draw(); }},
+  {label:'Interbody cage at 3 or more additional levels',
+    fn:function(){ save(); warn('For 3+ additional interbody levels with osteotomy, ensure primary code selection (22633 or 22630) covers the highest-wRVU level. Use +22634/+22632 for each subsequent interbody level. All osteotomy codes (22214, +22216) remain separately billable.'); S.step='pf_deform_fusion_ib2'; draw(); }},
+]); });
+
+step('pf_deform_fusion_ib2', function(){ return q('Were additional interspaces also fused posterolaterally without interbody cage?',[
+  {label:'No — interbody levels only', fn:function(){ go('pf_deform_fusion_done'); }},
+  {label:'Yes — additional posterolateral levels (+22614 per level)',
+    fn:function(){ save(); warn('Add +22614 for each additional posterolateral-only interspace beyond the interbody levels. Each interspace beyond the primary code requires one +22614.'); S.step='pf_deform_fusion_done'; draw(); }},
+]); });
+
+step('pf_deform_fusion_done', function(){ return q('Was the posterolateral fusion at thoracic levels, lumbar levels, or both?',[
+  {label:'Lumbar only — primary code 22612 already selected or covered by osteotomy level',
+    fn:function(){ go('pf_nav'); }},
+  {label:'Thoracic segment included — add 22610 if not already coded for thoracic levels',
+    fn:function(){ save(); warn('If the deformity construct includes thoracic posterolateral fusion not previously coded, add 22610 (thoracic posterolateral fusion, single interspace) as a primary code alongside the lumbar fusion/osteotomy codes.'); S.step='pf_nav'; draw(); }},
+  {label:'Both thoracic and lumbar — 22610 and 22612 already in code set', fn:function(){ go('pf_nav'); }},
+],'Confirm the primary posterolateral fusion code (22612 lumbar or 22610 thoracic) is present for the deformity construct if not already added via the PLIF/TLIF path.'); });
+
+step('pf_nav', function(){ return q('Was stereotactic navigation used?',[
+  {label:'Yes (+61783)', fn:function(){ save(); addC('61783'); goGraft('pf_bma'); }},
+  {label:'No',           fn:function(){ goGraft('pf_bma'); }},
+]); });
+
+// pf_graft_q removed — goGraft called directly
+
+step('pf_bma', function(){ return q('Was iliac bone marrow aspiration performed through a separate needle site?',[
+  {label:'Yes (+20939)', fn:function(){ doC('20939','pf_decomp'); }},
+  {label:'No',           fn:function(){ go('pf_decomp');          }},
+]); });
+
+
+step('pf_decomp', function(){ return q('Was a laminectomy or decompression also performed in the same session?',[
+  {label:'No decompression — fusion only',fn:function(){go('done');}},
+  {label:'Yes — decompression also performed',fn:function(){go('pf_decomp_type');}},
+]); });
+
+step('pf_decomp_type', function(){ return q('What type of decompression?',[
+  {label:'Complete laminectomy at one or more levels (complete lamina removed)',fn:function(){go('pf_lam_levels');}},
+  {label:'Laminotomy / hemilaminectomy / microdiscectomy (partial lamina)',fn:function(){go('pf_laminotomy');}},
+  {label:'Both — complete laminectomy at some levels AND laminotomy at others',fn:function(){go('pf_lam_levels');}},
+]); });
+
+step('pf_lam_levels', function(){ return q('How many lumbar or thoracic segments had complete laminectomy?',
+  [{label:'1-2 lumbar segments',fn:function(){doC('63005','pf_decomp_note');}},
+   {label:'3+ lumbar segments',fn:function(){doC('63017','pf_decomp_note');}},
+   {label:'Thoracic — 1 segment (63045)',fn:function(){doC('63045','pf_decomp_note');}},
+   {label:'Thoracic — 2+ segments (+63048)',fn:function(){save();addC('63045');addC('63048');S.step='pf_decomp_note';draw();}},
+  ],'Note: laminectomy at the same interspace as a PLIF/TLIF is bundled into 22630/22633 — do not bill separately at the same level.'); });
+
+step('pf_laminotomy', function(){ return q('How many interspaces had laminotomy / hemilaminectomy / microdiscectomy?',[
+  {label:'1 interspace (63030)',fn:function(){doC('63030','pf_decomp_note');}},
+  {label:'2 interspaces (63030 + 63035)',fn:function(){save();addC('63030');addC('63035');S.step='pf_decomp_note';draw();}},
+  {label:'3 interspaces (63030 + 63035 x2)',fn:function(){save();addC('63030');addN('63035',2);S.step='pf_decomp_note';draw();}},
+]); });
+
+step('pf_decomp_note', function(){ return q('Was the decompression performed at the same interspace(s) as the interbody fusion (PLIF/TLIF)?',[
+  {label:'No — decompression was at a distinct level from the fusion interspace(s)',fn:function(){go('done');}},
+  {label:'Yes — decompression was at the same level as the PLIF/TLIF',fn:function(){
+    save();
+    warn('Laminectomy at the same interspace as a PLIF/TLIF (22630/22633) is bundled — the laminectomy is inherent to the posterior interbody approach. Remove the standalone laminectomy code (63005/63030) at that level. Only bill decompression separately at levels distinct from the interbody fusion.');
+    S.step='done';draw();
+  }},
+  {label:'Mixed — some levels same as fusion, some distinct levels',fn:function(){
+    save();
+    warn('At levels where laminectomy is at the same interspace as PLIF/TLIF, the decompression code is bundled and should be removed. At distinct levels (e.g., additional decompression one level above or below the fusion), the laminectomy code is separately billable. Review each level against your operative note.');
+    S.step='done';draw();
+  }},
+]); });
+
+step('pf_rev', function(){ return q('What revision procedure?',[
+  {label:'Exploration only — no new fusion (22830)',    fn:function(){ doC('22830','done'); }},
+  {label:'Reinsertion of fixation device (22849)',      fn:function(){ doC('22849','done'); }},
+  {label:'Removal of posterior instrumentation — segmental (22852)',fn:function(){ doC('22852','done'); }},
+  {label:'Removal of non-segmental / plate (22852)',    fn:function(){ doC('22852','done'); }},
+  {label:'New fusion at adjacent segment — use primary codes', fn:function(){ save(); warn('Extension of fusion: use primary fusion codes (22612, 22630, 22633) for new levels. Hardware reinsertion/extension: use 22849.'); S.step='pf_inst'; draw(); }},
+]); });
+
+// ══════════════════════════════════════════════════════════════════════════
+// SI JOINT FUSION
+// ══════════════════════════════════════════════════════════════════════════
+step('si1', function(){ return q('What SI joint procedure was performed?',[
+  {label:'MIS lateral transfixing implants — iFuse, Silex, similar (27279)', fn:function(){ doC('27279','si_bilateral'); }},
+  {label:'MIS posterior approach — Rialto, Catamaran (Category III 0775T)',  fn:function(){ save(); warn('0775T is a Category III CPT code. Medicare coverage varies by MAC. Most commercial payers have non-coverage policies as of 2026. No established PFS wRVU — payment negotiated or denied.'); addC('0775T'); S.step='si_bilateral'; draw(); }},
+  {label:'Open SI joint arthrodesis posterior approach (27280)',              fn:function(){ doC('27280','si_open');     }},
+  {label:'Revision of prior SI joint fusion',                                fn:function(){ go('si_rev');               }},
+]); });
+
+step('si_open', function(){ return q('Primary open fusion or revision?',[
+  {label:'Primary open fusion (27280)',                           fn:function(){ go('si_bilateral'); }},
+  {label:'Revision — prior hardware removed before open fusion', fn:function(){ save(); warn('No dedicated revision SI fusion CPT code. Use 27280. Apply Mod 22 if significantly increased complexity — document adhesions, prior implant removal, and total operative time.'); S.step='si_bilateral'; draw(); }},
+]); });
+
+step('si_bilateral', function(){ return q('Was the procedure performed bilaterally?',[
+  {label:'No — unilateral only',      fn:function(){ go('si_imaging'); }},
+  {label:'Yes — bilateral SI fusion', fn:function(){ save(); warn('For bilateral SI fusion, bill primary code with Mod 50. Many payers require two separate line items. Bilateral payment is typically 150% of unilateral rate. Verify payer-specific billing requirements.'); S.step='si_imaging'; draw(); }},
+]); });
+
+step('si_imaging', function(){ return q('Was image guidance used?',[
+  {label:'Standard fluoroscopy only — included in 27279/27280, no separate code', fn:function(){ save(); warn('Fluoroscopic image guidance is included in 27279 and 27280. Do not add a separate fluoroscopy code.'); S.step='si_payer'; draw(); }},
+  {label:'CT navigation or stereotactic guidance (+61783)',                        fn:function(){ save(); addC('61783'); warn('+61783 separately reportable only when true CT-based stereotactic navigation is used, not fluoroscopy alone.'); S.step='si_payer'; draw(); }},
+]); });
+
+step('si_payer', function(){ return q('What is the payer?',[
+  {label:'Medicare',                       fn:function(){ save(); warn('Medicare covers 27279 under LCD L38672 or equivalent. Criteria: 3+ positive provocative tests, positive diagnostic injection with 75%+ pain relief, 6+ months failed conservative care, imaging confirming SIJ pathology. Verify your MAC LCD.'); S.step='si_graft_q'; draw(); }},
+  {label:'Commercial insurance',           fn:function(){ save(); warn('Most major commercial payers cover 27279 with criteria similar to Medicare. Obtain prior authorization before scheduling. Posterior MIS (0775T) has non-coverage at most commercial payers as of 2026.'); S.step='si_graft_q'; draw(); }},
+  {label:'Workers comp / self-pay / other',fn:function(){ go('si_graft_q'); }},
+]); });
+
+step('si_graft_q', function(){ return q('Was a separate bone graft placed beyond what is integral to the implant system?',[
+  {label:'No — graft integral to implant or no graft used', fn:function(){ go('si_nav'); }},
+  {label:'Yes — separate graft placed',                     fn:function(){ goGraft('si_nav'); }},
+]); });
+
+step('si_nav', function(){ return q('Was a concurrent lumbar fusion or sacropelvic procedure also performed?',[
+  {label:'No — SI fusion only',                             fn:function(){ go('done'); }},
+  {label:'Yes — lumbar fusion also performed at L5-S1 or above', fn:function(){ save(); warn('Lumbar fusion codes (22612, 22630, 22633) and SI fusion code (27279/27280) are not NCCI-bundled and are separately reportable. Bill both with documentation of separate surgical objectives.'); S.step='done'; draw(); }},
+  {label:'Yes — sacropelvic fixation also performed',       fn:function(){ save(); warn('Sacropelvic fixation (iliac or S2AI screws) as part of a lumbar deformity construct is coded under posterior instrumentation add-ons by segment count. This is distinct from SI joint arthrodesis (27279/27280).'); S.step='done'; draw(); }},
+]); });
+
+step('si_rev', function(){ return q('What revision SI procedure was performed?',[
+  {label:'Revision with new lateral implants placed (27279 + Mod 22)',    fn:function(){ save(); addC('27279'); warn('No dedicated revision SI fusion CPT code. Use 27279 with Mod 22. Document explant of prior device and reason for revision.'); S.step='si_bilateral'; draw(); }},
+  {label:'Implant removal only — no new fusion',                         fn:function(){ save(); warn('No dedicated CPT for SI implant removal. Options: 27299 (unlisted procedure pelvis/hip joint) or 20680 (removal of implant, deep). Use 27299 with operative report and letter of medical necessity.'); S.step='done'; draw(); }},
+  {label:'Conversion from MIS to open fusion (27280 + Mod 22)',          fn:function(){ save(); addC('27280'); warn('Conversion from failed MIS to open: bill 27280 with Mod 22. Document reason for conversion in operative report and prior auth submission.'); S.step='si_bilateral'; draw(); }},
+]); });
+
+var OP_NOTES = {
+  '22551': 'Document complete discectomy with removal of disc material, posterior annulus, and anterior osteophytes. Confirm decompression of cord and nerve root. Note dural pulsation restored. Document endplate preparation, cage or graft sizing and final position.',
+  '22552': 'For each add-on interspace: document separate disc removal, endplate preparation, and graft or cage placement as a distinct step from the primary level. Each level must be individually described.',
+  '22554': 'Document that only minimal discectomy was performed. Explicitly distinguish from a complete annulotomy and full disc removal. Note limited disc material removed without extensive posterior annulus excision.',
+  '22856': 'Document preoperative indication including preserved disc height, absence of significant facet arthropathy, and absence of segmental instability. Record device brand, size, and lordosis. Confirm full range of motion on fluoroscopy before closure.',
+  '22861': 'Document prior device in situ, clinical indication for revision, explant technique, device condition, and new device placement. Record post-implant fluoroscopic confirmation of position.',
+  '22845': 'Document anterior plate brand and dimensions. Record screw trajectory and purchase depth at each level. Confirm fluoroscopic AP and lateral hardware position. Note absence of graft or cage protrusion beyond anterior cortex.',
+  '22852': 'Document prior hardware removed by brand and type. Record condition of underlying fusion mass. Describe explant technique and any difficulty due to bone ingrowth.',
+  '22852': 'Document each implant removed by level and type. Describe prior fusion mass integrity. Record whether pseudarthrosis was identified. Note explant technique for each anchor.',
+  '22600': 'Document lateral mass or pedicle screw placement at each instrumented level. Record decortication of facets and transverse processes. Document graft placed in posterolateral gutters bilaterally. Confirm hardware position on intraoperative imaging.',
+  '22595': 'Document C1 lateral mass and C2 pedicle or isthmus screw technique. Record atlantoaxial reduction confirmed intraoperatively. Document graft placement and fluoroscopic or navigation confirmation.',
+  '22590': 'Document occipital plate positioning, keel depth, and screw fixation into occiput. Record subaxial extension levels. Document craniocervical junction alignment and intraoperative imaging confirmation.',
+  '63001': 'Document complete laminectomy with full lamina removed at each level. Record bilateral decompression of spinal canal. Note ligamentum flavum resected. Confirm dural pulsation restored post-decompression.',
+  '63020': 'Document hemilaminotomy only — not complete laminectomy. Record ipsilateral ligamentum flavum removal, nerve root visualization, foramen decompression confirmed, and absence of dural tear.',
+  '63005': 'Document specific segments decompressed, extent of laminectomy, whether facetectomy or foraminotomy was also performed (included in 63005 work), and nerve root decompression achieved. ICD-10: M48.06 (lumbar spinal stenosis), M47.816 (spondylosis with myelopathy lumbar), or M51.16/M51.17 for disc herniation.',
+  '63050': 'Document laminoplasty technique (open-door or French-door). Record hinge creation and opening dimension. If 63051 billed, document plate and spacer placement. Confirm canal decompression and preservation of posterior elements.',
+  '63005': 'Document complete laminectomy at each level with full lamina resection. Confirm bilateral canal decompression. Note ligamentum flavum resected and dural pulsation restored. Record hemostasis.',
+  '63017': 'Document 3 or more lumbar levels with complete laminectomy at each. Record bilateral decompression and dural pulsation confirmed at every level.',
+  '63030': 'Document hemilaminotomy only (partial lamina). Record discectomy with disc fragment removed and confirmed. Note nerve root decompressed, dural sleeve free and pulsating, foramen probed and patent.',
+  '63042': 'Document prior surgical scar at level, epidural adhesions encountered, careful dissection technique to avoid dural injury, recurrent disc material identified and removed, nerve root decompressed.',
+  '63012': 'Document spondylolisthesis grade, cauda equina involvement, complete laminectomy, bilateral foraminotomy, and adequate canal decompression confirmed.',
+  '63087': 'Document extent of vertebral body resection. Record spinal cord or dura decompression confirmed. Document anterior column reconstruction with cage dimensions and graft material.',
+  '22558': 'Document the specific approach used: ALIF retroperitoneal, ALIF transperitoneal, lateral retroperitoneal (LLIF/XLIF/OLIF), or prone lateral/PTP. All use 22558 regardless of approach route. Record annulotomy and complete discectomy, endplate preparation to bleeding bone, cage brand and dimensions, graft material, and fluoroscopic AP and lateral confirmation of cage position. If a separate access/vascular surgeon provided the approach, note this explicitly to support Mod 62 billing for both surgeons. Modifier 51 note: add-on codes billed with 22558 (such as +22585, +22853, +22845) never receive Mod 51. If 22558 is billed alongside a separate standalone procedure such as posterior fusion (22612) in the same session, apply Mod 51 to the lower-wRVU standalone code.',
+  '22586': 'Document presacral approach technique, axial cannulation, discectomy and endplate preparation, implant sizing confirmed, and biplanar fluoroscopic confirmation of final implant position.',
+  '22857': 'Document single-level L3-S1 indication, preserved disc height and absence of significant facet arthropathy confirmed preoperatively, complete discectomy with endplate preservation, device brand and sizing, range of motion confirmed on fluoroscopy.',
+  '22630': 'Document posterior interbody approach type (PLIF or TLIF), laminectomy and facetectomy performed for access, complete discectomy and endplate preparation to bleeding bone, cage brand and size, graft material, neural elements protected, fluoroscopic AP and lateral cage position.',
+  '22633': 'Document combined posterolateral AND interbody fusion at the same interspace as distinct sequential steps. Describe decortication for posterolateral component separately from the interbody discectomy and cage placement.',
+  '22612': 'Document decortication of facets, transverse processes, and pars bilaterally. Record graft placed in posterolateral gutters. Note screw-rod construct placement and intraoperative imaging confirming alignment and hardware position.',
+  '22214': 'Document pedicle subtraction osteotomy technique including pedicle removal, lateral vertebral wall osteotomy, posterior vertebral wall resection, and anterior column closure. Record sagittal correction achieved in degrees. Document neuromonitoring baseline and post-closure signals.',
+  '22212': 'Document thoracic SPO or PSO technique, posterior column shortening at the specified vertebra, degree of correction achieved, osteotomy closure confirmed by fluoroscopy, and neuromonitoring signals stable throughout.',
+  '27279': 'Document SIJ pathology confirmed by preoperative provocative testing and diagnostic injection. Record lateral positioning, fluoroscopic guide pin placement confirmed on AP, inlet, and outlet views. Document implant brand, size, and number placed. Confirm final position on all three fluoroscopic projections.',
+  '27280': 'Document posterior approach to SIJ, joint exposure, cartilage removal and joint surface preparation, bone graft placed, hardware fixation across joint, and fluoroscopic confirmation of final position.',
+  '22840': 'Document non-segmental fixation spanning single interspace. Record screw placement at two adjacent vertebral bodies, rod connection, final tightening, and fluoroscopic confirmation.',
+  '22842': 'Document pedicle screw placement at each instrumented vertebral level (3-6 bodies). Record bilateral rod placement, compression or distraction applied as indicated, final torque applied, and intraoperative imaging of all screw positions.',
+  '22843': 'Document pedicle screw placement at 7-12 vertebral levels. Each anchor level individually documented. Record rod placement and final construct imaging.',
+  '22844': 'Document long-segment construct spanning 13 or more vertebral levels. Record each screw level individually. Include pelvic fixation anchors in total if used. Confirm full construct on intraoperative imaging.',
+  '61783': 'Document stereotactic navigation system by brand. Record reference array placement, CT or fluoroscopic acquisition for navigation, registration accuracy confirmed, and instrument guidance via navigation for each implant placed.',
+  '20930': 'Medicare assigns $0 wRVU to 20930 (morselized allograft) — no physician payment under Medicare PFS. Always submit to commercial payers as payment policies vary and many commercial plans reimburse. Document allograft brand and lot number, volume placed, and that it was morselized (not structural) graft material.',
+  '20936': 'Medicare assigns $0 wRVU to 20936 (local autograft same incision) — no physician payment under Medicare PFS. Submit to commercial payers; many reimburse for this code. Document that graft material was harvested from the same incision as the primary procedure (spinous process, lamina, or local posterior elements). Specify volume harvested and that no separate incision was made.',
+  '20931': 'Document structural allograft brand, size, and type (cortical ring, dowel, or tricortical block). Confirm structural load-bearing application distinct from morselized allograft. Record placement location.',
+  '20937': 'Document separate iliac crest incision site, morselized graft harvest technique, volume harvested, and harvest site closure. Explicitly note this is a separate incision from the primary wound to distinguish from 20936.',
+  '20938': 'Document separate iliac crest incision, structural cortical graft dimensions harvested, and harvest site closure. Confirm structural load-bearing graft application.',
+  '20939': 'Document separate aspiration needle insertion site at iliac crest. Record volume aspirated and aspiration technique. If 20937 or 20938 also billed, confirm aspiration was through a distinct needle insertion site.',
+};
+
+// Boot
+draw();
+</script>
+</body>
+</html>
