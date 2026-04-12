@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Draft Idea for Dr. Larry Specht</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e14;
+  --surface: #111620;
+  --surface2: #171d2b;
+  --border: #1e2a3a;
+  --border2: #253044;
+  --text: #c8d6e8;
+  --text-dim: #5a7190;
+  --text-mid: #8aa0b8;
+  --accent: #00d4aa;
+  --accent2: #0099ff;
+  --warn: #f5a623;
+  --danger: #e84040;
+  --green: #22c55e;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* HEADER */
+.header {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+}
+.logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.logo span { color: var(--text-dim); }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.badge.warn { border-color: #5a3a00; color: var(--warn); background: rgba(245,166,35,0.05); }
+
+/* NAV TABS */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  gap: 0;
+}
+.tab {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 14px 24px;
+  cursor: pointer;
+  color: var(--text-dim);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  background: none;
+}
+.tab:hover { color: var(--text-mid); }
+.tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+/* CONTENT SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ARCHITECTURE PAGE */
+.arch-page { padding: 40px; }
+.arch-page h1 {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.arch-page .subtitle {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.arch-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.arch-card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.arch-card-header h2 {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.arch-card-header p {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.rec-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.rec-badge.epic { background: rgba(0,153,255,0.12); color: var(--accent2); border: 1px solid rgba(0,153,255,0.25); }
+.rec-badge.standalone { background: rgba(0,212,170,0.12); color: var(--accent); border: 1px solid rgba(0,212,170,0.25); }
+
+/* FLOW DIAGRAM */
+.flow {
+  padding: 24px;
+}
+.flow-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 4px;
+  position: relative;
+}
+.flow-node:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 36px;
+  width: 1px;
+  height: calc(100% - 20px);
+  background: var(--border2);
+}
+.node-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  border: 1px solid;
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 11px;
+  z-index: 1;
+}
+.node-icon.blue { background: rgba(0,153,255,0.1); border-color: rgba(0,153,255,0.3); color: var(--accent2); }
+.node-icon.green { background: rgba(0,212,170,0.1); border-color: rgba(0,212,170,0.3); color: var(--accent); }
+.node-icon.warn { background: rgba(245,166,35,0.1); border-color: rgba(245,166,35,0.3); color: var(--warn); }
+.node-icon.dim { background: rgba(90,113,144,0.1); border-color: rgba(90,113,144,0.3); color: var(--text-dim); }
+
+.node-body {
+  padding-bottom: 20px;
+  flex: 1;
+}
+.node-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.node-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.node-tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  margin-top: 5px;
+  margin-right: 4px;
+}
+.node-tag.constraint { background: rgba(232,64,64,0.1); color: #e84040; border: 1px solid rgba(232,64,64,0.2); }
+.node-tag.advantage { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.node-tag.req { background: rgba(245,166,35,0.1); color: var(--warn); border: 1px solid rgba(245,166,35,0.2); }
+
+/* COMPARISON TABLE */
+.compare-table {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+.compare-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.compare-table th {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 20px;
+  text-align: left;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-mid);
+}
+.compare-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-mid);
+  white-space: nowrap;
+  width: 160px;
+}
+.td-epic { color: var(--accent2); }
+.td-sa { color: var(--accent); }
+.td-neutral { color: var(--text-dim); }
+
+.check { color: var(--green); }
+.cross { color: var(--danger); }
+.mid { color: var(--warn); }
+
+/* LEGAL BOX */
+.legal-box {
+  border: 1px solid rgba(245,166,35,0.3);
+  background: rgba(245,166,35,0.04);
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.legal-box h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--warn);
+  margin-bottom: 10px;
+}
+.legal-box ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legal-box li {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+.legal-box li::before {
+  content: '!';
+  position: absolute;
+  left: 0;
+  color: var(--warn);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+/* TOOL PAGE */
+.tool-page { padding: 40px; }
+.tool-header {
+  margin-bottom: 32px;
+}
+.tool-header h1 {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.tool-header p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.tool-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.panel-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.panel-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-card-body { padding: 18px; }
+
+.form-group { margin-bottom: 16px; }
+.form-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  display: block;
+}
+.form-input, .form-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+.upload-zone {
+  border: 1px dashed var(--border2);
+  border-radius: 3px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg);
+}
+.upload-zone:hover { border-color: var(--accent); background: rgba(0,212,170,0.03); }
+.upload-icon { font-size: 22px; margin-bottom: 8px; }
+.upload-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.upload-label span { color: var(--accent); }
+
+.run-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.run-btn:hover { background: #00f0c0; }
+.run-btn:disabled { background: var(--border2); color: var(--text-dim); cursor: not-allowed; }
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { font-size: 12px; color: var(--text-dim); }
+.stat-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+.stat-val.green { color: var(--green); }
+.stat-val.warn { color: var(--warn); }
+.stat-val.danger { color: var(--danger); }
+.stat-val.blue { color: var(--accent2); }
+
+/* RIGHT PANEL - PATIENT TABLE */
+.right-panel {}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.search-input {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 3px;
+  outline: none;
+  width: 220px;
+}
+.search-input:focus { border-color: var(--accent); }
+.filter-btns { display: flex; gap: 6px; }
+.filter-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  background: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 0.15s;
+}
+.filter-btn.active { background: rgba(0,212,170,0.1); border-color: var(--accent); color: var(--accent); }
+.filter-btn:hover:not(.active) { color: var(--text-mid); border-color: var(--border2); }
+
+.patient-table {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.pt-header {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1.2fr 1.5fr 1fr;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.pt-header span {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+.pt-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr 1.2fr 1.5fr 1fr;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.1s;
+  cursor: pointer;
+}
+.pt-row:last-child { border-bottom: none; }
+.pt-row:hover { background: var(--surface2); }
+.pt-row.flagged { background: rgba(232,64,64,0.04); }
+.pt-row.flagged:hover { background: rgba(232,64,64,0.08); }
+
+.pt-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.pt-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+.pt-field {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-mid);
+}
+.pt-dop { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+.status-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.status-pill.clean { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.status-pill.clean::before { background: var(--green); }
+.status-pill.flagged { background: rgba(232,64,64,0.1); color: var(--danger); border: 1px solid rgba(232,64,64,0.2); }
+.status-pill.flagged::before { background: var(--danger); }
+.status-pill.pending { background: rgba(245,166,35,0.1); color: var(--warn); border: 1px solid rgba(245,166,35,0.2); }
+.status-pill.pending::before { background: var(--warn); box-shadow: 0 0 0 2px rgba(245,166,35,0.3); animation: pulse 1.5s infinite; }
+.status-pill.outside { background: rgba(0,153,255,0.1); color: var(--accent2); border: 1px solid rgba(0,153,255,0.2); }
+.status-pill.outside::before { background: var(--accent2); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.action-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  background: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 0.15s;
+}
+.action-btn:hover { color: var(--text); border-color: var(--text-mid); }
+.action-btn.alert { border-color: rgba(232,64,64,0.4); color: var(--danger); }
+.action-btn.alert:hover { background: rgba(232,64,64,0.1); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.modal-header p { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.close-btn:hover { color: var(--text); }
+.modal-body { padding: 24px; }
+.modal-section { margin-bottom: 24px; }
+.modal-section h4 {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.rx-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.rx-item.flag { border-color: rgba(232,64,64,0.3); background: rgba(232,64,64,0.04); }
+.rx-drug { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.rx-details { font-family: var(--mono); font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+.rx-flag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  background: rgba(232,64,64,0.12);
+  color: var(--danger);
+  border: 1px solid rgba(232,64,64,0.25);
+  border-radius: 2px;
+  margin-top: 6px;
+  display: inline-block;
+}
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.modal-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--text-dim);
+}
+.modal-btn:hover { color: var(--text); border-color: var(--text-mid); }
+.modal-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 600;
+}
+.modal-btn.primary:hover { background: #00f0c0; }
+.modal-btn.danger {
+  background: rgba(232,64,64,0.1);
+  border-color: rgba(232,64,64,0.4);
+  color: var(--danger);
+}
+
+/* API PAGE */
+.api-page { padding: 40px; }
+.api-page h1 {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.api-page .subtitle {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.state-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.state-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.state-detail { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.state-status {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  margin-top: 8px;
+  display: inline-block;
+}
+.state-status.yes { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.state-status.no { background: rgba(232,64,64,0.1); color: var(--danger); border: 1px solid rgba(232,64,64,0.2); }
+.state-status.partial { background: rgba(245,166,35,0.1); color: var(--warn); border: 1px solid rgba(245,166,35,0.2); }
+
+.code-block {
+  background: #070a10;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+.code-comment { color: #3d5266; }
+.code-key { color: #00aaff; }
+.code-val { color: #00d4aa; }
+.code-str { color: #e8a060; }
+.code-fn { color: #c678dd; }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Mock Draft <span>/</span> Dr. Larry Specht</div>
+  <div class="header-right">
+    <div class="badge warn">Concept / Pre-Compliance Review</div>
+    <div class="badge">Massachusetts MassPAT</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('arch')">Architecture</button>
+  <button class="tab" onclick="showTab('tool')">Tool Mockup</button>
+  <button class="tab" onclick="showTab('api')">PDMP API Guide</button>
+</div>
+
+<!-- ===================== ARCHITECTURE TAB ===================== -->
+<div id="arch" class="section active">
+<div class="arch-page">
+  <h1>Two Architecture Paths</h1>
+  <p class="subtitle">Both approaches detect outside opioid prescriptions in surgical patients at the 7-day post-op mark. They differ in technical integration requirements, legal complexity, and time to deploy. Massachusetts uses MassPAT (PMP AWARxE platform via Bamboo Health), with mandatory query requirements under MGL Ch. 94C Sec. 24A for Schedule II/III opioids and benzodiazepines. Lahey Clinic is part of Beth Israel Lahey Health, which runs Epic.</p>
+
+  <div class="legal-box">
+    <h3>Compliance Prerequisites (Both Paths)</h3>
+    <ul>
+      <li>Massachusetts law (MGL Ch. 94C Sec. 24A) mandates PDMP query before prescribing Schedule II or III opioids or benzodiazepines. Authorized queriers include the prescribing provider and their registered delegates. Automated/batch queries require approval from the MA Department of Public Health Drug Control Program.</li>
+      <li>HIPAA minimum-necessary standard applies. Query results must be stored in or linked to the patient's medical record, not in a standalone database.</li>
+      <li>Delegate authority must be established in writing and registered in MassPAT. Automated systems acting as a delegate require the same credentialing as a human delegate under MA DPH policy.</li>
+      <li>MassPAT is administered via PMP AWARxE (Bamboo Health). Integration with Epic at Beth Israel Lahey Health requires a Bamboo Health PMP Gateway agreement and institutional IT approval.</li>
+    </ul>
+  </div>
+
+  <div class="arch-grid">
+
+    <!-- EPIC PATH -->
+    <div class="arch-card">
+      <div class="arch-card-header">
+        <div>
+          <h2>Path A: Epic-Integrated</h2>
+          <p>Trigger PDMP query from within Epic at 7 days post-op using Epic's MassPAT integration via Bamboo Health PMP Gateway and the BestPractice Advisory (BPA) framework</p>
+        </div>
+        <div class="rec-badge epic">Epic Native</div>
+      </div>
+      <div class="flow">
+
+        <div class="flow-node">
+          <div class="node-icon blue">01</div>
+          <div class="node-body">
+            <div class="node-label">Surgical Case Tagged in Epic</div>
+            <div class="node-desc">OR case signed off. Epic records procedure date, surgeon, patient MRN. Smart Phrase or SmartForm captures procedure type for post-op order set trigger.</div>
+            <span class="node-tag advantage">No new integration</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon blue">02</div>
+          <div class="node-body">
+            <div class="node-label">Epic BPA Fires at Day 7</div>
+            <div class="node-desc">Best Practice Advisory configured by Epic build team. Triggers on date arithmetic: procedure_date + 7 days. Fires in inbox or at next chart open. Requires Epic TS involvement and governance approval.</div>
+            <span class="node-tag req">IT governance required</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon blue">03</div>
+          <div class="node-body">
+            <div class="node-label">MassPAT Query Launched</div>
+            <div class="node-desc">Epic launches MassPAT query via Bamboo Health PMP Gateway integration. Beth Israel Lahey Health has this integration active across the system. Returns Massachusetts Schedule II-V prescription history plus interstate data via PMP InterConnect from neighboring states (NH, RI, CT, VT, NY, ME). Results display inline in chart.</div>
+            <span class="node-tag advantage">Interstate data included</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon blue">04</div>
+          <div class="node-body">
+            <div class="node-label">Surgeon Reviews in Chart</div>
+            <div class="node-desc">Provider sees NarxScore, recent prescriptions, dispensing dates, and prescribers. Result is automatically documented in the patient's chart per Epic's PDMP audit logging.</div>
+            <span class="node-tag advantage">Auto-documented</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon warn">05</div>
+          <div class="node-body">
+            <div class="node-label">Action: Respond or Flag</div>
+            <div class="node-desc">If outside opioid found: document clinical response in note. If prescriber conflict identified: secure message to relevant provider. Routing logic handled manually or via Epic InBasket workflow.</div>
+            <span class="node-tag constraint">Manual follow-up</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STANDALONE PATH -->
+    <div class="arch-card">
+      <div class="arch-card-header">
+        <div>
+          <h2>Path B: Standalone Tool</h2>
+          <p>Surgeon or coordinator uploads patient list. Tool queries state PDMP API directly and returns flagged results outside the EHR</p>
+        </div>
+        <div class="rec-badge standalone">Standalone Build</div>
+      </div>
+      <div class="flow">
+
+        <div class="flow-node">
+          <div class="node-icon green">01</div>
+          <div class="node-body">
+            <div class="node-label">Patient List Upload</div>
+            <div class="node-desc">Coordinator exports surgical schedule from Epic (CSV: MRN, name, DOB, procedure date, surgeon NPI). Uploads to standalone PDMP tool. Data must stay within HIPAA-compliant infrastructure.</div>
+            <span class="node-tag req">BAA with tool vendor required</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon green">02</div>
+          <div class="node-body">
+            <div class="node-label">Day-7 Filter Applied</div>
+            <div class="node-desc">Tool calculates current_date minus procedure_date. Patients at day 7 (configurable: 6-8 day window) are queued for PDMP query. Future patients queued for future runs. Historical patients archived.</div>
+            <span class="node-tag advantage">Configurable window</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon green">03</div>
+          <div class="node-body">
+            <div class="node-label">MassPAT API Batch Query</div>
+            <div class="node-desc">Tool submits queries to MassPAT via Bamboo Health PMP Gateway API using surgeon NPI as the requesting provider. Requires MA DPH Drug Control Program approval for automated/batch access plus a Bamboo Health vendor agreement. Returns Schedule II-V prescription history per patient for configurable lookback window (default: 30 days post-op).</div>
+            <span class="node-tag constraint">MA DPH approval required</span>
+            <span class="node-tag constraint">Bamboo Health agreement required</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon green">04</div>
+          <div class="node-body">
+            <div class="node-label">Flag Logic Applied</div>
+            <div class="node-desc">Tool flags: (1) any opioid Rx from a different prescriber, (2) Rx for same drug class as post-op prescription, (3) Rx within 48h of discharge, (4) controlled substance from 3+ unique prescribers in 30 days. Clean patients marked green.</div>
+            <span class="node-tag advantage">Configurable rules</span>
+          </div>
+        </div>
+
+        <div class="flow-node">
+          <div class="node-icon warn">05</div>
+          <div class="node-body">
+            <div class="node-label">Dashboard + Alert Routing</div>
+            <div class="node-desc">Flagged patients surfaced in surgeon dashboard. Alert can route to coordinator InBasket or secure message. Results must be copied to Epic chart to maintain documentation continuity. This step requires manual action or an Epic API write-back.</div>
+            <span class="node-tag constraint">Manual chart documentation</span>
+            <span class="node-tag req">Epic write-back: optional Phase 2</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="compare-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th style="color:var(--accent2)">Path A: Epic BPA</th>
+          <th style="color:var(--accent)">Path B: Standalone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Time to deploy</td>
+          <td class="td-epic">3-6 months (Epic build queue + governance)</td>
+          <td class="td-sa">4-8 weeks (after PDMP API agreement)</td>
+        </tr>
+        <tr>
+          <td>PDMP API agreement</td>
+          <td class="td-epic"><span class="check">&#x2713;</span> Already handled by Epic/Bamboo Health PMP Gateway contract at Beth Israel Lahey Health</td>
+          <td class="td-sa"><span class="cross">&#x2717;</span> Requires direct MA DPH Drug Control Program application and Bamboo Health vendor agreement</td>
+        </tr>
+        <tr>
+          <td>Interstate data</td>
+          <td class="td-epic"><span class="check">&#x2713;</span> PMP InterConnect included natively (NH, RI, CT, VT, NY, ME)</td>
+          <td class="td-sa"><span class="mid">~</span> Requires separate interstate query setup</td>
+        </tr>
+        <tr>
+          <td>Chart documentation</td>
+          <td class="td-epic"><span class="check">&#x2713;</span> Auto-logged in Epic per MassPAT/PMP Gateway integration</td>
+          <td class="td-sa"><span class="cross">&#x2717;</span> Manual copy to chart (or Phase 2 API write-back)</td>
+        </tr>
+        <tr>
+          <td>Batch query capability</td>
+          <td class="td-epic"><span class="cross">&#x2717;</span> Per-patient query only, triggered by chart open or BPA</td>
+          <td class="td-sa"><span class="check">&#x2713;</span> Full surgical list queried in single run</td>
+        </tr>
+        <tr>
+          <td>Custom flag logic</td>
+          <td class="td-epic"><span class="cross">&#x2717;</span> NarxScore only, no custom rule configuration</td>
+          <td class="td-sa"><span class="check">&#x2713;</span> Fully configurable: drug class, prescriber count, timing</td>
+        </tr>
+        <tr>
+          <td>IT governance required</td>
+          <td class="td-epic"><span class="cross">&#x2717;</span> Yes, Epic TS + institutional approval</td>
+          <td class="td-sa"><span class="check">&#x2713;</span> No institutional Epic build needed</td>
+        </tr>
+        <tr>
+          <td>HIPAA/data risk</td>
+          <td class="td-epic">Lower — data stays in Epic</td>
+          <td class="td-sa">Higher — PHI leaves Epic, requires BAA</td>
+        </tr>
+        <tr>
+          <td>Best for</td>
+          <td class="td-epic">Practices with Epic TS bandwidth and institutional support</td>
+          <td class="td-sa">Independent practices, ASCs, or multi-surgeon groups without Epic IT support</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="padding:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);font-size:13px;color:var(--text-dim);line-height:1.7;">
+    <strong style="color:var(--text);font-family:var(--mono);font-size:12px;">RECOMMENDATION:</strong>
+    For Lahey Clinic / Beth Israel Lahey Health, Path A via Epic BPA is the correct long-term architecture. The system-wide Bamboo Health PMP Gateway integration is already in place, documentation is automatic, and mandatory MassPAT query is already a compliance requirement under MGL Ch. 94C Sec. 24A. The incremental build needed is a BPA rule that fires at post-op day 7 -- an Epic governance request, not a new vendor relationship. Path B (standalone tool) is viable for an independent or single-surgeon context outside the Lahey system where Epic integration is not available.
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== TOOL MOCKUP TAB ===================== -->
+<div id="tool" class="section">
+<div class="tool-page">
+  <div class="tool-header">
+    <h1>Post-Op PDMP Monitor <span style="color:var(--text-dim);font-weight:300">/ Mockup</span></h1>
+    <p>Standalone tool. Upload surgical patient list. Tool filters to day-7 post-op window, queries Massachusetts MassPAT via Bamboo Health PMP Gateway API, and surfaces outside opioid prescriptions. This is a UI prototype; MassPAT API connection requires MA DPH Drug Control Program authorization and a Bamboo Health vendor agreement.</p>
+  </div>
+
+  <div class="tool-layout">
+
+    <!-- LEFT CONTROLS -->
+    <div class="left-panel">
+
+      <div class="panel-card">
+        <div class="panel-card-header">Configuration</div>
+        <div class="panel-card-body">
+          <div class="form-group">
+            <label class="form-label">Surgeon NPI</label>
+            <input class="form-input" type="text" value="1234567890" placeholder="10-digit NPI">
+          </div>
+          <div class="form-group">
+            <label class="form-label">PDMP State</label>
+            <select class="form-select">
+              <option>Massachusetts (MassPAT)</option>
+              <option>New Hampshire (NH PDMP)</option>
+              <option>Rhode Island (RI PDMP)</option>
+              <option>Connecticut (CT PDMP)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Query Window (post-op days)</label>
+            <input class="form-input" type="text" value="Day 6 to Day 8">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lookback Period (days)</label>
+            <input class="form-input" type="text" value="30 days from discharge">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-card-header">Patient List Upload</div>
+        <div class="panel-card-body">
+          <div class="upload-zone">
+            <div class="upload-icon">&#x1F4C4;</div>
+            <div class="upload-label">Drop CSV from Epic<br><span>or click to browse</span></div>
+          </div>
+          <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text-dim);line-height:1.6;">
+            Required columns:<br>
+            MRN, LastName, FirstName, DOB, ProcedureDate, CPT, SurgeonNPI
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-card-header">Run Status</div>
+        <div class="panel-card-body">
+          <div class="stat-row"><span class="stat-label">Patients loaded</span><span class="stat-val blue">24</span></div>
+          <div class="stat-row"><span class="stat-label">In day-7 window</span><span class="stat-val blue">8</span></div>
+          <div class="stat-row"><span class="stat-label">Queries sent</span><span class="stat-val green">8</span></div>
+          <div class="stat-row"><span class="stat-label">Clean</span><span class="stat-val green">5</span></div>
+          <div class="stat-row"><span class="stat-label">Flagged</span><span class="stat-val danger">2</span></div>
+          <div class="stat-row"><span class="stat-label">Pending</span><span class="stat-val warn">1</span></div>
+        </div>
+      </div>
+
+      <button class="run-btn" onclick="alert('In production: initiates batch MassPAT query for all day-7 patients via Bamboo Health PMP Gateway API.\n\nRequires: MA DPH Drug Control Program approval + Bamboo Health PMP Gateway vendor agreement + delegate authorization on file.')">
+        Run PDMP Query
+      </button>
+
+    </div>
+
+    <!-- RIGHT TABLE -->
+    <div class="right-panel">
+      <div class="table-toolbar">
+        <input class="search-input" type="text" placeholder="Search patients...">
+        <div class="filter-btns">
+          <button class="filter-btn active">All (8)</button>
+          <button class="filter-btn">Flagged (2)</button>
+          <button class="filter-btn">Clean (5)</button>
+          <button class="filter-btn">Pending (1)</button>
+        </div>
+      </div>
+
+      <div class="patient-table">
+        <div class="pt-header">
+          <span>Patient</span>
+          <span>Procedure</span>
+          <span>Post-Op Day</span>
+          <span>Your Last Rx</span>
+          <span>PDMP Status</span>
+          <span>Action</span>
+        </div>
+
+        <!-- FLAGGED ROW 1 -->
+        <div class="pt-row flagged" onclick="openModal('johnson')">
+          <div>
+            <div class="pt-name">Johnson, Marcus T.</div>
+            <div class="pt-sub">DOB 04/12/1968 &nbsp;|&nbsp; MRN 00412847</div>
+          </div>
+          <div><div class="pt-field">L4-L5 TLIF</div><div class="pt-sub">22630 + 22842</div></div>
+          <div class="pt-field" style="color:var(--text)">Day 7</div>
+          <div><div class="pt-field">Oxycodone 5mg</div><div class="pt-sub">Qty 30 &nbsp;|&nbsp; 04/05/26</div></div>
+          <div><span class="status-pill flagged">Outside Rx Found</span></div>
+          <div><button class="action-btn alert">Review</button></div>
+        </div>
+
+        <!-- FLAGGED ROW 2 -->
+        <div class="pt-row flagged" onclick="openModal('chen')">
+          <div>
+            <div class="pt-name">Chen, Wei</div>
+            <div class="pt-sub">DOB 09/22/1975 &nbsp;|&nbsp; MRN 00388204</div>
+          </div>
+          <div><div class="pt-field">C5-C6 ACDF</div><div class="pt-sub">22551</div></div>
+          <div class="pt-field" style="color:var(--text)">Day 7</div>
+          <div><div class="pt-field">Hydrocodone 5mg</div><div class="pt-sub">Qty 20 &nbsp;|&nbsp; 04/05/26</div></div>
+          <div><span class="status-pill flagged">Outside Rx Found</span></div>
+          <div><button class="action-btn alert">Review</button></div>
+        </div>
+
+        <!-- CLEAN ROW -->
+        <div class="pt-row">
+          <div>
+            <div class="pt-name">Patel, Anita R.</div>
+            <div class="pt-sub">DOB 01/30/1982 &nbsp;|&nbsp; MRN 00501938</div>
+          </div>
+          <div><div class="pt-field">L5-S1 MIS TLIF</div><div class="pt-sub">22630</div></div>
+          <div class="pt-field">Day 7</div>
+          <div><div class="pt-field">Oxycodone 5mg</div><div class="pt-sub">Qty 20 &nbsp;|&nbsp; 04/05/26</div></div>
+          <div><span class="status-pill clean">Clean</span></div>
+          <div><button class="action-btn">View</button></div>
+        </div>
+
+        <!-- CLEAN ROW 2 -->
+        <div class="pt-row">
+          <div>
+            <div class="pt-name">Okafor, Emmanuel B.</div>
+            <div class="pt-sub">DOB 07/14/1959 &nbsp;|&nbsp; MRN 00619027</div>
+          </div>
+          <div><div class="pt-field">L3-L5 Laminectomy</div><div class="pt-sub">63017</div></div>
+          <div class="pt-field">Day 8</div>
+          <div><div class="pt-field">Tramadol 50mg</div><div class="pt-sub">Qty 30 &nbsp;|&nbsp; 04/04/26</div></div>
+          <div><span class="status-pill clean">Clean</span></div>
+          <div><button class="action-btn">View</button></div>
+        </div>
+
+        <!-- OUTSIDE prescriber -->
+        <div class="pt-row" onclick="">
+          <div>
+            <div class="pt-name">Reyes, Sofia M.</div>
+            <div class="pt-sub">DOB 03/05/1990 &nbsp;|&nbsp; MRN 00724411</div>
+          </div>
+          <div><div class="pt-field">C3-C5 Laminectomy</div><div class="pt-sub">63001</div></div>
+          <div class="pt-field">Day 6</div>
+          <div><div class="pt-field">None prescribed</div><div class="pt-sub">NSAIDs only</div></div>
+          <div><span class="status-pill clean">Clean</span></div>
+          <div><button class="action-btn">View</button></div>
+        </div>
+
+        <!-- PENDING -->
+        <div class="pt-row">
+          <div>
+            <div class="pt-name">Williams, Darnell K.</div>
+            <div class="pt-sub">DOB 11/08/1971 &nbsp;|&nbsp; MRN 00832016</div>
+          </div>
+          <div><div class="pt-field">L4-S1 PSF</div><div class="pt-sub">22612 + 22842</div></div>
+          <div class="pt-field">Day 7</div>
+          <div><div class="pt-field">Oxycodone 5mg</div><div class="pt-sub">Qty 30 &nbsp;|&nbsp; 04/05/26</div></div>
+          <div><span class="status-pill pending">Querying...</span></div>
+          <div><button class="action-btn">Wait</button></div>
+        </div>
+
+        <!-- CLEAN 3 -->
+        <div class="pt-row">
+          <div>
+            <div class="pt-name">Thompson, Linda J.</div>
+            <div class="pt-sub">DOB 06/19/1965 &nbsp;|&nbsp; MRN 00944382</div>
+          </div>
+          <div><div class="pt-field">L2-L4 Laminectomy</div><div class="pt-sub">63017</div></div>
+          <div class="pt-field">Day 7</div>
+          <div><div class="pt-field">Hydrocodone 5mg</div><div class="pt-sub">Qty 20 &nbsp;|&nbsp; 04/05/26</div></div>
+          <div><span class="status-pill clean">Clean</span></div>
+          <div><button class="action-btn">View</button></div>
+        </div>
+
+        <!-- CLEAN 4 -->
+        <div class="pt-row">
+          <div>
+            <div class="pt-name">Nakamura, Hiroshi</div>
+            <div class="pt-sub">DOB 02/28/1978 &nbsp;|&nbsp; MRN 01012563</div>
+          </div>
+          <div><div class="pt-field">SI Joint Fusion</div><div class="pt-sub">27279 x2</div></div>
+          <div class="pt-field">Day 6</div>
+          <div><div class="pt-field">Oxycodone 5mg</div><div class="pt-sub">Qty 20 &nbsp;|&nbsp; 04/06/26</div></div>
+          <div><span class="status-pill clean">Clean</span></div>
+          <div><button class="action-btn">View</button></div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text-dim);">
+        Last run: Today 07:14 AM &nbsp;|&nbsp; Next auto-run: Tomorrow 06:00 AM &nbsp;|&nbsp; Data source: Massachusetts MassPAT via Bamboo Health PMP Gateway
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== API PAGE ===================== -->
+<div id="api" class="section">
+<div class="api-page">
+  <h1>Massachusetts MassPAT API Guide</h1>
+  <p class="subtitle">Massachusetts uses MassPAT, built on Bamboo Health's PMP AWARxE platform. API access for automated queries is available via the Bamboo Health PMP Gateway. MGL Ch. 94C Sec. 24A mandates PDMP query before prescribing Schedule II or III opioids or benzodiazepines, making this the only state PDMP tool in the country with a statutory prescribing mandate tied to it. Interstate data sharing covers all New England states plus New York via PMP InterConnect.</p>
+
+  <div class="state-grid">
+    <div class="state-card">
+      <div class="state-name">Massachusetts (Primary)</div>
+      <div class="state-detail">System: MassPAT (PMP AWARxE via Bamboo Health)<br>Mandate: MGL Ch. 94C Sec. 24A -- required before Sch II/III opioids and benzodiazepines<br>API access: PMP Gateway available; batch requires MA DPH Drug Control Program approval<br>Contact: mapmp.dph@mass.gov | 617-753-7310<br>Portal: massachusetts.pmpaware.net</div>
+      <div class="state-status yes">API Available</div>
+    </div>
+    <div class="state-card">
+      <div class="state-name">New Hampshire</div>
+      <div class="state-detail">System: NH PDMP (PMP AWARxE via Bamboo Health)<br>Interstate: Enrolled in PMP InterConnect -- MA queries pull NH data automatically via Epic integration<br>Standalone API: Available with NH Board of Pharmacy approval<br>Relevant for: Lahey patients who live in southern NH (Nashua, Manchester corridors)</div>
+      <div class="state-status yes">InterConnect Active</div>
+    </div>
+    <div class="state-card">
+      <div class="state-name">Rhode Island</div>
+      <div class="state-detail">System: RI PDMP (PMP AWARxE via Bamboo Health)<br>Interstate: Enrolled in PMP InterConnect<br>Standalone API: Available with RI DPH approval<br>Relevant for: Patients from Providence metro area seen at Lahey</div>
+      <div class="state-status yes">InterConnect Active</div>
+    </div>
+    <div class="state-card">
+      <div class="state-name">Connecticut</div>
+      <div class="state-detail">System: CT PDMP (PMP AWARxE via Bamboo Health)<br>Interstate: Enrolled in PMP InterConnect<br>Standalone API: Available with CT DCP approval<br>Relevant for: Patients traveling to Lahey from CT for complex spine cases</div>
+      <div class="state-status yes">InterConnect Active</div>
+    </div>
+    <div class="state-card">
+      <div class="state-name">Vermont</div>
+      <div class="state-detail">System: Vermont PDMP (PMP AWARxE via Bamboo Health)<br>Interstate: Enrolled in PMP InterConnect<br>Standalone API: Available with VT DPH approval<br>Relevant for: Occasional referrals from Dartmouth-Hitchcock region</div>
+      <div class="state-status yes">InterConnect Active</div>
+    </div>
+    <div class="state-card">
+      <div class="state-name">New York</div>
+      <div class="state-detail">System: I-STOP (NY DOH) -- separate platform from AWARxE<br>Interstate: Partial InterConnect participation; I-STOP data not always returned via standard PMP Gateway query<br>Standalone API: EHR-embedded only via NY DOH direct agreement<br>Limitation: Most likely to have gap in interstate data coverage</div>
+      <div class="state-status partial">Partial Coverage</div>
+    </div>
+  </div>
+
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.08em;">
+    Sample API Request Structure (Bamboo Health PMP Gateway / MassPAT)
+  </div>
+
+  <div class="code-block">
+<span class="code-comment">// Massachusetts MassPAT query via Bamboo Health PMP Gateway</span>
+<span class="code-comment">// Requires: PMP Gateway credentials issued under surgeon NPI + MA DPH Drug Control Program approval</span>
+<span class="code-comment">// Portal registration: https://massachusetts.pmpaware.net</span>
+<span class="code-comment">// Program contact: mapmp.dph@mass.gov | 617-753-7310</span>
+
+<span class="code-fn">POST</span> https://gateway.bamboohealth.com/pmp/v2/patient-report
+
+<span class="code-comment">// Request headers</span>
+{
+  <span class="code-key">"Authorization"</span>: <span class="code-str">"Bearer {pmp_gateway_api_key}"</span>,
+  <span class="code-key">"X-Requesting-NPI"</span>: <span class="code-str">"{surgeon_npi}"</span>,
+  <span class="code-key">"X-Requesting-DEA"</span>: <span class="code-str">"{surgeon_dea}"</span>,
+  <span class="code-key">"X-State"</span>: <span class="code-str">"MA"</span>,
+  <span class="code-key">"X-Facility-ID"</span>: <span class="code-str">"lahey-clinic-burlington"</span>,
+  <span class="code-key">"Content-Type"</span>: <span class="code-str">"application/json"</span>
+}
+
+<span class="code-comment">// Request body (per patient)</span>
+{
+  <span class="code-key">"patient"</span>: {
+    <span class="code-key">"firstName"</span>: <span class="code-str">"Marcus"</span>,
+    <span class="code-key">"lastName"</span>: <span class="code-str">"Johnson"</span>,
+    <span class="code-key">"dateOfBirth"</span>: <span class="code-str">"1968-04-12"</span>,
+    <span class="code-key">"zipCode"</span>: <span class="code-str">"01803"</span>  <span class="code-comment">// Burlington MA</span>
+  },
+  <span class="code-key">"requestType"</span>: <span class="code-str">"FULL_REPORT"</span>,
+  <span class="code-key">"lookbackDays"</span>: <span class="code-val">30</span>,
+  <span class="code-key">"includeInterstate"</span>: <span class="code-val">true</span>,   <span class="code-comment">// pulls NH, RI, CT, VT, ME via PMP InterConnect</span>
+  <span class="code-key">"schedules"</span>: [<span class="code-str">"II"</span>, <span class="code-str">"III"</span>, <span class="code-str">"IV"</span>, <span class="code-str">"V"</span>]  <span class="code-comment">// MA monitors all Sch II-V</span>
+}
+
+<span class="code-comment">// Response fields relevant to flag logic</span>
+{
+  <span class="code-key">"patientFound"</span>: <span class="code-val">true</span>,
+  <span class="code-key">"reportDate"</span>: <span class="code-str">"2026-04-12"</span>,
+  <span class="code-key">"prescriptions"</span>: [
+    {
+      <span class="code-key">"drug"</span>: <span class="code-str">"OXYCODONE HCL 10MG"</span>,
+      <span class="code-key">"quantity"</span>: <span class="code-val">20</span>,
+      <span class="code-key">"daysSupply"</span>: <span class="code-val">5</span>,
+      <span class="code-key">"dispensedDate"</span>: <span class="code-str">"2026-04-09"</span>,
+      <span class="code-key">"schedule"</span>: <span class="code-str">"II"</span>,
+      <span class="code-key">"prescriberNPI"</span>: <span class="code-str">"9876543210"</span>,  <span class="code-comment">// different from surgeon NPI = FLAG</span>
+      <span class="code-key">"prescriberName"</span>: <span class="code-str">"Smith, John D MD"</span>,
+      <span class="code-key">"prescriberDEA"</span>: <span class="code-str">"BS1234567"</span>,
+      <span class="code-key">"pharmacy"</span>: <span class="code-str">"Walgreens #3847, Woburn MA 01801"</span>,
+      <span class="code-key">"sourceState"</span>: <span class="code-str">"MA"</span>
+    }
+  ],
+  <span class="code-key">"interstateResults"</span>: {   <span class="code-comment">// populated when includeInterstate: true</span>
+    <span class="code-key">"statesQueried"</span>: [<span class="code-str">"NH"</span>, <span class="code-str">"RI"</span>, <span class="code-str">"CT"</span>, <span class="code-str">"VT"</span>, <span class="code-str">"ME"</span>],
+    <span class="code-key">"statesWithData"</span>: [],
+    <span class="code-key">"statesUnavailable"</span>: [<span class="code-str">"NY"</span>]  <span class="code-comment">// NY I-STOP not fully integrated</span>
+  }
+}
+  </div>
+
+  <div class="legal-box">
+    <h3>Massachusetts MassPAT: API Authorization Steps for Dr. Specht / Lahey Clinic</h3>
+    <ul>
+      <li>Register or confirm existing MassPAT account at massachusetts.pmpaware.net. The surgeon's DEA number and MA controlled substance registration must be active and on file. Contact mapmp.dph@mass.gov or 617-753-7310 to initiate institutional API access discussion.</li>
+      <li>Submit a request to MA DPH Drug Control Program for batch/automated query authorization, identifying the requesting provider (surgeon NPI/DEA), the institutional entity (Beth Israel Lahey Health / Lahey Clinic), and the automated system requesting delegate access.</li>
+      <li>Execute a Data Use Agreement with MA DPH specifying permitted uses (post-op opioid stewardship monitoring), data retention policy, and breach notification obligations under MGL Ch. 93H and HIPAA.</li>
+      <li>Contact Bamboo Health (PMP AWARxE support: 855-562-4767) to initiate PMP Gateway vendor agreement. If Beth Israel Lahey Health already has an institutional PMP Gateway contract for Epic integration, a separate agreement for the standalone tool may require an addendum rather than a new contract.</li>
+      <li>Establish a HIPAA Business Associate Agreement with the tool developer before any PHI transmission occurs. Document delegate authorization for automated querying in compliance records, signed by Dr. Specht as the supervising prescriber.</li>
+      <li>Note: Because MGL Ch. 94C Sec. 24A already mandates MassPAT query before Sch II/III opioid prescribing, the compliance argument for this stewardship tool is straightforward. The automated batch query extends mandatory behavior into a proactive post-op monitoring workflow rather than creating a new obligation.</li>
+    </ul>
+  </div>
+
+</div>
+</div>
+
+<!-- MODAL: Johnson flagged detail -->
+<div id="modal-johnson" class="modal-overlay" onclick="closeModal(event, 'johnson')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h3>Johnson, Marcus T. &nbsp; <span style="color:var(--danger);font-size:12px;">2 Flags</span></h3>
+        <p>DOB 04/12/1968 &nbsp;|&nbsp; MRN 00412847 &nbsp;|&nbsp; L4-L5 TLIF (22630+22842) &nbsp;|&nbsp; Surgery 04/05/2026</p>
+      </div>
+      <button class="close-btn" onclick="closeModalDirect('johnson')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h4>Your Prescriptions (Post-Op)</h4>
+        <div class="rx-item">
+          <div class="rx-drug">Oxycodone HCl 5mg #30</div>
+          <div class="rx-details">Prescribed: 04/05/2026 (Day of discharge)<br>Prescriber: You (NPI 1234567890)<br>Pharmacy: CVS #2241, Burlington MA &nbsp;|&nbsp; Dispensed: 04/05/2026</div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>Outside Prescriptions (PDMP)</h4>
+        <div class="rx-item flag">
+          <div class="rx-drug">Oxycodone HCl 10mg #20</div>
+          <div class="rx-details">Prescribed: 04/09/2026 (Day 4 post-op)<br>Prescriber: Smith, John D MD &nbsp;|&nbsp; NPI 9876543210 (PCP)<br>Pharmacy: Walgreens #3847, Woburn MA &nbsp;|&nbsp; Dispensed: 04/09/2026</div>
+          <div class="rx-flag">&#x26A0; Same drug class, different prescriber, Day 4 post-op</div>
+        </div>
+        <div class="rx-item flag">
+          <div class="rx-drug">Cyclobenzaprine 10mg #30</div>
+          <div class="rx-details">Prescribed: 04/09/2026<br>Prescriber: Smith, John D MD &nbsp;|&nbsp; NPI 9876543210 (PCP)<br>Pharmacy: Walgreens #3847, Woburn MA &nbsp;|&nbsp; Dispensed: 04/09/2026</div>
+          <div class="rx-flag">&#x26A0; Muscle relaxant, same-day as opioid from outside prescriber</div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>NarxScore</h4>
+        <div style="display:flex;gap:16px;">
+          <div style="background:var(--bg);border:1px solid rgba(232,64,64,0.3);border-radius:3px;padding:12px 20px;text-align:center;">
+            <div style="font-family:var(--mono);font-size:24px;font-weight:600;color:var(--danger);">203</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:4px;">OPIOID</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 20px;text-align:center;">
+            <div style="font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text-dim);">0</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:4px;">STIMULANT</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 20px;text-align:center;">
+            <div style="font-family:var(--mono);font-size:24px;font-weight:600;color:var(--text-dim);">42</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-top:4px;">SEDATIVE</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-dim);">NarxScore opioid 203: above threshold (200). May indicate early post-op escalation. PCP contact warranted to align pain management plan.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModalDirect('johnson')">Dismiss</button>
+      <button class="modal-btn" onclick="alert('Opens Epic InBasket to message PCP Smith, John D MD')">Message PCP</button>
+      <button class="modal-btn danger" onclick="alert('Flags for care manager review and documents review in Epic chart')">Escalate to Care Manager</button>
+      <button class="modal-btn primary" onclick="alert('Documents PDMP review in Epic note. Marks patient reviewed.')">Document in Epic</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Chen -->
+<div id="modal-chen" class="modal-overlay" onclick="closeModal(event, 'chen')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h3>Chen, Wei &nbsp; <span style="color:var(--danger);font-size:12px;">1 Flag</span></h3>
+        <p>DOB 09/22/1975 &nbsp;|&nbsp; MRN 00388204 &nbsp;|&nbsp; C5-C6 ACDF (22551) &nbsp;|&nbsp; Surgery 04/05/2026</p>
+      </div>
+      <button class="close-btn" onclick="closeModalDirect('chen')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <h4>Outside Prescriptions (PDMP)</h4>
+        <div class="rx-item flag">
+          <div class="rx-drug">Hydrocodone/APAP 5/325mg #15</div>
+          <div class="rx-details">Prescribed: 04/10/2026 (Day 5 post-op)<br>Prescriber: Nguyen, Thanh L MD &nbsp;|&nbsp; NPI 8765432109 (Urgent Care)<br>Pharmacy: Rite Aid #0892, Lowell MA &nbsp;|&nbsp; Dispensed: 04/10/2026</div>
+          <div class="rx-flag">&#x26A0; Opioid from urgent care visit, Day 5 post-op. Likely patient self-managed pain escalation.</div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>Clinical Context</h4>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.7;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px 14px;">
+          Patient visited urgent care 5 days post-ACDF. Outside prescriber may not have known about recent cervical spine surgery. Hydrocodone dose is low (5mg). Likely represents undertreated post-op pain rather than diversion. Consider direct patient contact to assess pain level and adjust plan. Document communication in Epic.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModalDirect('chen')">Dismiss</button>
+      <button class="modal-btn" onclick="alert('Opens patient portal message to Chen, Wei')">Contact Patient</button>
+      <button class="modal-btn primary" onclick="alert('Documents PDMP review in Epic note.')">Document in Epic</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+}
+function closeModal(event, id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+}
+function closeModalDirect(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+}
+
+// filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
